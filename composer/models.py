@@ -3,15 +3,17 @@ import inspect
 import re
 
 from django.conf import settings
-from django.contrib.contenttypes import generic
+from django.contrib.contenttypes.fields import GenericForeignKey
 from django.contrib.contenttypes.models import ContentType
 from django.core.cache import cache
+from django.core.validators import MaxValueValidator, MinValueValidator
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
 
 from jmbo.managers import DefaultManager, PermittedManager
 
 # TODO: Make sure page is unique per url and site
+from composer import SETTINGS as app_settings
 
 class AttributeWrapper:
     """
@@ -107,7 +109,7 @@ limited to one or two sentences."),
                     column, tiles=struct[row][column]))
             result.append(AttributeWrapper(row, columns=column_objs))
 
-        cache.set(key, cPickle.dumps(result), settings.FOUNDRY.get("layout_cache_time", 60))
+        cache.set(key, cPickle.dumps(result),app_settings["layout_cache_time"]
 
         return result
 
@@ -253,7 +255,7 @@ class Tile(models.Model):
         null=True,
     )
 
-    target = generic.GenericForeignKey(
+    target = GenericForeignKey(
         "target_content_type",
         "target_object_id",
     )
@@ -278,7 +280,7 @@ it works - you cannot break anything.""",
 
     condition_expression = models.CharField(
         max_length=255,
-        help_text="A python expression. Variable request is in scope."
+        help_text="A python expression. Variable request is in scope.",
         null=True,
         blank=True,
     )
