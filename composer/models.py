@@ -170,7 +170,8 @@ class Row(models.Model):
         """Fetch columns and tiles in a single query"""
         # Organize into a structure
         struct = {}
-        tiles = Tile.objects.select_related().filter(column__row=self).order_by("position")
+        tiles = Tile.objects.select_related().filter(
+                column__row=self).order_by("position")
         for tile in tiles:
             column = tile.column
             if column not in struct:
@@ -212,8 +213,8 @@ class Column(models.Model):
 
     designation = models.CharField(
         max_length=32,
-        help_text="Applicable to content (green) rows. Used to display columns \
-to the left and right of the content block.",
+        help_text="Applicable to content (green) rows. Used to display \
+                columns to the left and right of the content block.",
         choices=(
             ("left", _("Left")),
             ("right", _("Right")),
