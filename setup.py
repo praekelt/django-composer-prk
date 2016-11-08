@@ -13,7 +13,8 @@ setup(
     packages = find_packages(),
     install_requires = [
         # Redundant. Pip handles this now.
-        "jmbo"
+        "jmbo",
+        "django-nested-admin",
     ],
     include_package_data=True,
     classifiers=[
