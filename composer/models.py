@@ -1,25 +1,24 @@
-from __future__ import unicode_literals
-
-from django.db import models
-
+import cPickle
 import inspect
 import re
-import cPickle
-
-from django.core.cache import cache
-from django.utils.translation import ugettext_lazy as _
-from django.contrib.contenttypes.models import ContentType
-from django.contrib.contenttypes import generic
 
 from django.conf import settings
+from django.contrib.contenttypes import generic
+from django.contrib.contenttypes.models import ContentType
+from django.core.cache import cache
+from django.db import models
+from django.utils.translation import ugettext_lazy as _
 
-from jmbo.managers import DefaultManager
-from jmbo.managers import PermittedManager
+from jmbo.managers import DefaultManager, PermittedManager
 
 # TODO: Make sure page is unique per url and site
 
 class AttributeWrapper:
-    """Wrapper that allows attributes to be added or overridden on an object"""
+    """
+    Wrapper that allows attributes to be added or overridden on an object.
+
+    Copied from jmbo-foundry.
+    """
 
     def __init__(self, obj, **kwargs):
         self._obj = obj
@@ -37,8 +36,10 @@ class AttributeWrapper:
 
     @property
     def klass(self):
-        """Can't override __class__ and making it a property also does not
-        work. Could be because of Django metaclasses."""
+        """
+        Can't override __class__ and making it a property also does not work.
+        Could be because of Django metaclasses.
+        """
         return self._obj.__class__
 
 
@@ -71,9 +72,11 @@ limited to one or two sentences."),
 
     @property
     def rows(self):
-        """Fetch rows, columns and tiles in a single query"""
+        """
+        Fetch rows, columns and tiles in a single query
+        """
 
-        key = "foundry-page-rows-%s" % self.id
+        key = "composer-page-rows-%s" % self.id
         cached = cache.get(key, None)
         if cached:
             return cPickle.loads(cached)
@@ -100,7 +103,8 @@ limited to one or two sentences."),
             keys_column.sort(lambda a, b: cmp(a.position, b.position))
             column_objs = []
             for column in keys_column:
-                column_objs.append(AttributeWrapper(column, tiles=struct[row][column]))
+                column_objs.append(AttributeWrapper(
+                    column, tiles=struct[row][column]))
             result.append(AttributeWrapper(row, columns=column_objs))
 
         cache.set(key, cPickle.dumps(result), settings.FOUNDRY.get("layout_cache_time", 60))
