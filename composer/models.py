@@ -59,7 +59,6 @@ limited to one or two sentences."),
     sites = models.ManyToManyField(
         "sites.Site",
         help_text="Sites that this page will appear on.",
-        null=True,
         blank=True,
     )
 
@@ -109,7 +108,7 @@ limited to one or two sentences."),
                     column, tiles=struct[row][column]))
             result.append(AttributeWrapper(row, columns=column_objs))
 
-        cache.set(key, cPickle.dumps(result),app_settings["layout_cache_time"]
+        cache.set(key, cPickle.dumps(result),app_settings["layout_cache_time"])
 
         return result
 
@@ -144,7 +143,7 @@ class PageView(models.Model):
 
 class Row(models.Model):
     page = models.ForeignKey(Page)
-    position = models.PositiveIntegerField(default=0, editable=False)
+    position = models.PositiveIntegerField(default=0)
     block_name = models.CharField(
         max_length=32,
         default="content",
@@ -191,10 +190,7 @@ class Row(models.Model):
 class Column(models.Model):
     row = models.ForeignKey(Row)
 
-    position = models.PositiveIntegerField(
-        default=0,
-        editable=False,
-    )
+    position = models.PositiveIntegerField(default=0)
 
     width = models.PositiveIntegerField(
         default=8,
@@ -241,10 +237,7 @@ class Tile(models.Model):
     """
     column = models.ForeignKey(Column)
 
-    position = models.PositiveIntegerField(
-        default=0,
-        editable=False,
-    )
+    position = models.PositiveIntegerField(default=0)
 
     target_content_type = models.ForeignKey(
         ContentType,
