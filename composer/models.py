@@ -6,6 +6,7 @@ from django.conf import settings
 from django.contrib.contenttypes.fields import GenericForeignKey
 from django.contrib.contenttypes.models import ContentType
 from django.core.cache import cache
+from django.core.urlresolvers import get_script_prefix
 from django.core.validators import MaxValueValidator, MinValueValidator
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
@@ -46,6 +47,14 @@ class AttributeWrapper:
 
 
 class Page(models.Model):
+    url = models.CharField(
+        _('URL'),
+        max_length=100,
+        default="/",
+        db_index=True,
+        help_text=_("Where on the site this page will appear. Start and end \
+with a slash. Example: '/about-us/people/'"),
+    )
     title = models.CharField(
         max_length=200,
         help_text="A title that may appear in the browser window caption.",
@@ -66,10 +75,13 @@ limited to one or two sentences."),
     permitted = PermittedManager()
 
     def __unicode__(self):
-        if self.subtitle:
-            return "%s (%s)" % (self.title, self.subtitle)
-        else:
-            return self.title
+        # Use same pattern as flatpages
+        return "%s -- %s" % (self.url, self.title)
+
+    def get_absolute_url(self):
+        # Taken from flatpages
+        # Handle script prefix manually because we bypass reverse()
+        return iri_to_uri(get_script_prefix().rstrip('/') + self.url)
 
     @property
     def rows(self):
