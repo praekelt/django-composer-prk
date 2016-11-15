@@ -5,21 +5,19 @@ from django.core.cache import cache
 from ..models import Row
 from .. import SETTINGS as app_settings
 import cPickle
-from django.core.urlresolvers import reverse, NoReverseMatch
+from django.core.urlresolvers import reverse, resolve, NoReverseMatch
 from django.template.loader import render_to_string
 from jmbo.templatetags.jmbo_inclusion_tags import RenderObjectNode
+from django.template.response import TemplateResponse
+from BeautifulSoup import BeautifulSoup
 """
 import types
 import hashlib
 import re
 
-from BeautifulSoup import BeautifulSoup
 
 from django import template
-from django.core.urlresolvers import reverse, resolve, NoReverseMatch, \
-    get_script_prefix
 from django.http import HttpResponse, Http404
-from django.template.response import TemplateResponse
 from django.core.paginator import Paginator, InvalidPage
 from django.contrib.sites.models import get_current_site
 
@@ -168,14 +166,9 @@ class TileNode(template.Node):
             # Fallback: get the generalised render_object node
             if node is None:
                 with context.push():
-                    try:
-                        context['tile_target'] = tile.target
-                        return RenderObjectNode("tile_target", "detail")\
-                                .render(context)
-                    except:
-                        if settings.DEBUG:
-                            raise
-                        return "A render error has occurred"
+                    context['tile_target'] = tile.target
+                    return RenderObjectNode("tile_target", "detail")\
+                            .render(context)
 
             try:
                 return node('"'+tile.target.slug+'"').render(
@@ -188,8 +181,8 @@ class TileNode(template.Node):
 
 @register.tag
 def tile_url(parser, token):
-    """Return the Url for a given view. Very similar to the {% url %} template tag,
-    but can accept a variable as first parameter."""
+    """Return the Url for a given view. Very similar to the {% url %} template
+    tag, but can accept a variable as first parameter."""
     try:
         tag_name, tile = token.split_contents()
     except ValueError:
