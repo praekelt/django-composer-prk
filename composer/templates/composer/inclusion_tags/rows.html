@@ -1,35 +1,23 @@
-{% load composer_tags %}
+{% load ultracache_tags composer_tags %}
 
 {% for row in rows %}
-
-    {% foundrycache row %} 
-    <table class="foundry-page-row {{ row.class_name }}" cellspacing="0">
-        <tr>
-        {% for column in row.columns %}
-            {% foundrycache column %} 
-            <td class="foundry-page-column foundry-page-column-{{ column.width }} {{ column.class_name }}">
-                {% if column.title %}<div class="title">{{ column.title }}</div>{% endif %}
-
-                {% if include_center_marker %}
-                    {% ifchanged column.designation %}
-                        {% if not column.designation %}
-                            _FOUNDRY_BLOCKNODE_PLACEHOLDER
-                        {% endif %}
-                    {% endifchanged %}
-                {% endif %}
-                {% for tile in column.tiles %}
-                    {% foundrycache tile %} 
-                    <div class="foundry-page-tile {{ tile.class_name }} {% if tile.enable_ajax %}foundry-enable-ajax{% endif %}"
-                         original_url="{% tile_url tile %}">
-                        {% tile tile %}
-                    </div>
-                    {% endfoundrycache %}
-                {% endfor %}                
-            </td>
-            {% endfoundrycache %}
-        {% endfor %}
-        </tr>
-    </table>
-    {% endfoundrycache %}
+    {% comment %}
+        TODO: row does not have a modified field, this is too greedy.
+    {% endcomment %}
+    {% ultracache 3600 'composer_rows' row.id %} 
+        <div class="composer-row {{ row.class_name }}">
+            {% for column in row.columns %}
+                <div class="composer-column composer-column-{{ column.width }} {{ column.class_name }}">
+                    {% if column.title %}<div class="title">{{ column.title }}</div>{% endif %}
+                    {% for tile in column.tiles %}
+                        <div class="composer-tile {{ tile.class_name }} {% if tile.enable_ajax %}composer-enable-ajax{% endif %}"
+                             original_url="{% tile_url tile %}">
+                            {% tile tile %}
+                        </div>
+                    {% endfor %}
+                </div>
+            {% endfor %}
+        </div>
+    {% endultracache %}
 
 {% endfor %}

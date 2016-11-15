@@ -5,7 +5,9 @@ from django.core.cache import cache
 from ..models import Row
 from .. import SETTINGS as app_settings
 import cPickle
+from django.core.urlresolvers import reverse, NoReverseMatch
 from django.template.loader import render_to_string
+from jmbo.templatetags.jmbo_inclusion_tags import RenderObjectNode
 """
 import types
 import hashlib
@@ -162,8 +164,22 @@ class TileNode(template.Node):
         if tile.target:
             # Use convention to lookup node
             node = globals().get("%sNode" % tile.target.__class__.__name__)
+
+            # Fallback: get the generalised render_object node
+            if node is None:
+                with context.push():
+                    try:
+                        context['tile_target'] = tile.target
+                        return RenderObjectNode("tile_target", "detail")\
+                                .render(context)
+                    except:
+                        if settings.DEBUG:
+                            raise
+                        return "A render error has occurred"
+
             try:
-                return node('"'+tile.target.slug+'"').render(context, as_tile=True)
+                return node('"'+tile.target.slug+'"').render(
+                        context, as_tile=True)
             except:
                 if settings.DEBUG:
                     raise
@@ -198,6 +214,8 @@ class TileUrlNode(template.Node):
         if tile.target:
             # xxx: not strictly correct since target may be menu or navbar.
             # No harm done for now.
-            url = reverse("listing-detail", args=[tile.target.slug])
+            try:
+                url = reverse("listing-detail", args=[tile.target.slug])
+            except NoReverseMatch:
+                url = tile.target.get_absolute_url()
             return url
-
