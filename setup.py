@@ -15,6 +15,7 @@ setup(
         # Redundant. Pip handles this now.
         "jmbo",
         "django-nested-admin",
+        "BeautifulSoup",
     ],
     include_package_data=True,
     classifiers=[
