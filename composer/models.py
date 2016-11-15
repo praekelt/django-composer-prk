@@ -241,10 +241,12 @@ class Tile(models.Model):
         ContentType,
         related_name="tile_target_content_type",
         null=True,
+        blank=True,
     )
 
     target_object_id = models.PositiveIntegerField(
         null=True,
+        blank=True,
     )
 
     target = GenericForeignKey(
