@@ -13,13 +13,13 @@ def slots(request):
     # TODO: Generalize to containing paths and/or urlconf regexes.
     url = request.path_info
     # TODO: This can be recursively rolled up to the root url
-    url_slots = list(Slot.objects.filter(url=url).values("pk", "slot_name"))
+    url_slots = list(Slot.objects.filter(url=url))
     # TODO: This can be cached separately, since it's the same for all urls.
-    base_slots = list(Slot.objects.filter(url="/").values("pk", "slot_name"))
+    base_slots = list(Slot.objects.filter(url="/"))
 
     base_slots.extend(url_slots)
     slots = {}
     for slot in base_slots:
-        slots[slot["slot_name"]] = slot["pk"]
+        slots[slot.slot_name] = slot
 
-    return {"slots": slots}
+    return {"composer_slots": slots}

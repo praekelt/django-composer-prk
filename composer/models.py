@@ -266,7 +266,6 @@ style template.",
         blank=True,
     )
 
-    # TODO: use jmbo-listing styles, add a style field
     @property
     def label(self):
         return str(self.target or self.view_name)

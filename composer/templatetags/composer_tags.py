@@ -54,20 +54,17 @@ class ComposerNode(template.Node):
             return
 
         # Return nothing if the context processor is not installed
-        if "slots" not in context:
+        if "composer_slots" not in context:
             return
 
         # Return nothing if the slot does not exist
-        if self.slot_name not in context["slots"]:
+        if self.slot_name not in context["composer_slots"]:
             return
 
-        # TODO: This seems backward. Could call this tag with the slot id
-        # directly instead of with the slot designation.
-        # TODO: Rename this to composer-slots
-        # TODO: Use the object, not ids. because ultracache
-        slot_id = context["slots"][self.slot_name]
+        slot_id = context["composer_slots"][self.slot_name].id
 
         # Cache homepage rows_by_block_name
+        # TODO: Is this caching needed, given ultracache?
         key = "composer-slot-%s" % slot_id
         cached = cache.get(key, None)
         if cached is None:
