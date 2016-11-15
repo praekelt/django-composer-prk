@@ -1,7 +1,7 @@
 from django.contrib import admin
 import nested_admin
 
-from .models import Page, Row, Column, Tile
+from .models import Slot, Row, Column, Tile
 
 
 class TileInline(nested_admin.NestedTabularInline):
@@ -24,8 +24,8 @@ class RowInline(nested_admin.NestedTabularInline):
     extra = 0
 
 
-class PageAdmin(nested_admin.NestedModelAdmin):
+class SlotAdmin(nested_admin.NestedModelAdmin):
     inlines = [RowInline]
 
 
-admin.site.register(Page, PageAdmin)
+admin.site.register(Slot, SlotAdmin)

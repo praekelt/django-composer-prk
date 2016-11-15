@@ -13,7 +13,7 @@ from django.utils.translation import ugettext_lazy as _
 
 from jmbo.managers import DefaultManager, PermittedManager
 
-# TODO: Make sure page is unique per url and site
+# TODO: Make sure slot is unique per url and site
 from composer import SETTINGS as app_settings
 
 class AttributeWrapper:
@@ -46,14 +46,28 @@ class AttributeWrapper:
         return self._obj.__class__
 
 
-class Page(models.Model):
+class Slot(models.Model):
     url = models.CharField(
         _('URL'),
         max_length=100,
         default="/",
         db_index=True,
-        help_text=_("Where on the site this page will appear. Start and end \
+        help_text=_("Where on the site this slot will appear. Start and end \
 with a slash. Example: '/about-us/people/'"),
+    )
+    # TODO: Add option to also render on all urls below this one. For now,
+    # that defaults to True.
+    # TODO: Add field with options to pick from a range of urlconf regexes.
+    slot_name = models.CharField(
+        max_length=32,
+        default="content",
+        # TODO: Derive this from base template nodes.
+        choices=(
+            ("header", _("Header")),
+            ("content", _("Content")),
+            ("footer", _("Footer")),
+        ),
+        help_text="Which base template slot should this be rendered in?"
     )
     title = models.CharField(
         max_length=200,
@@ -67,7 +81,7 @@ limited to one or two sentences."),
     )
     sites = models.ManyToManyField(
         "sites.Site",
-        help_text="Sites that this page will appear on.",
+        help_text="Sites that this slot will appear on.",
         blank=True,
     )
 
@@ -89,13 +103,13 @@ limited to one or two sentences."),
         Fetch rows, columns and tiles in a single query
         """
 
-        key = "composer-page-rows-%s" % self.id
+        key = "composer-slot-rows-%s" % self.id
         cached = cache.get(key, None)
         if cached:
             return cPickle.loads(cached)
 
         # Organize into a structure
-        tiles = Tile.objects.select_related().filter(column__row__page=self)\
+        tiles = Tile.objects.select_related().filter(column__row__slot=self)\
                 .order_by("position")
         struct = {}
         for tile in tiles:
@@ -138,43 +152,15 @@ limited to one or two sentences."),
         return result
 
 
-class PageView(models.Model):
-    """
-    We need this bridging class for fast lookups
-    """
-    page = models.ForeignKey(Page)
-
-    view_name = models.CharField(
-        max_length=200,
-        help_text="A view that uses the target page to render itself.",
-    )
-
-    def __unicode__(self):
-        return "%s > %s" % (self.page.title, self.view_name)
-
-
 class Row(models.Model):
-    page = models.ForeignKey(Page)
+    slot = models.ForeignKey(Slot)
     position = models.PositiveIntegerField(default=0)
-    block_name = models.CharField(
-        max_length=32,
-        default="content",
-        choices=(
-            ("header", _("Header")),
-            ("content", _("Content")),
-            ("footer", _("Footer")),
-        ),
-        help_text="The Django base template block that this row is rendered \
-            within. It is only applicable if the page is set to be the home \
-            page."
-    )
     class_name = models.CharField(
         max_length=200,
         help_text="One or more CSS classes that are applied to the row.",
         null=True,
         blank=True,
     )
-
 
     @property
     def columns(self):
