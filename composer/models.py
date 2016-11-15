@@ -205,18 +205,6 @@ class Column(models.Model):
         blank=True,
     )
 
-    designation = models.CharField(
-        max_length=32,
-        help_text="Applicable to content (green) rows. Used to display \
-                columns to the left and right of the content block.",
-        choices=(
-            ("left", _("Left")),
-            ("right", _("Right")),
-        ),
-        default="",
-        null=True,
-        blank=True,
-    )
     class_name = models.CharField(
         max_length=200,
         help_text="One or more CSS classes that are applied to the column.",
@@ -263,6 +251,14 @@ it works - you cannot break anything.""",
         blank=True,
     )
 
+    style = models.CharField(
+        max_length=200,
+        help_text="Display style. This corresponds to a listing or object \
+style template.",
+        null=True,
+        blank=True,
+    )
+
     class_name = models.CharField(
         max_length=200,
         help_text="One or more CSS classes that are applied to the tile.",
@@ -270,23 +266,7 @@ it works - you cannot break anything.""",
         blank=True,
     )
 
-    enable_ajax = models.BooleanField(default=False)
-
-    condition_expression = models.CharField(
-        max_length=255,
-        help_text="A python expression. Variable request is in scope.",
-        null=True,
-        blank=True,
-    )
-
+    # TODO: use jmbo-listing styles, add a style field
     @property
     def label(self):
         return str(self.target or self.view_name)
-
-    def condition_expression_result(self, request):
-        if not self.condition_expression:
-            return True
-        try:
-            return eval(self.condition_expression)
-        except:
-            return False

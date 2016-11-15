@@ -63,6 +63,8 @@ class ComposerNode(template.Node):
 
         # TODO: This seems backward. Could call this tag with the slot id
         # directly instead of with the slot designation.
+        # TODO: Rename this to composer-slots
+        # TODO: Use the object, not ids. because ultracache
         slot_id = context["slots"][self.slot_name]
 
         # Cache homepage rows_by_block_name
