@@ -10,6 +10,7 @@ from django.template.loader import render_to_string
 from jmbo.templatetags.jmbo_inclusion_tags import RenderObjectNode
 from django.template.response import TemplateResponse
 from BeautifulSoup import BeautifulSoup
+
 """
 import types
 import hashlib
@@ -155,23 +156,32 @@ class TileNode(template.Node):
             return html
 
         if tile.target:
-            # Use convention to lookup node
-            node = globals().get("%sNode" % tile.target.__class__.__name__)
-
-            # Fallback: get the generalised render_object node
-            if node is None:
+            # Use the RenderObjectNode shortcut for modelbase objects
+            if hasattr(tile.target, "modelbase_obj"):
                 with context.push():
                     context['tile_target'] = tile.target
                     return RenderObjectNode("tile_target", "detail")\
                             .render(context)
 
-            try:
-                return node('"'+tile.target.slug+'"').render(
-                        context, as_tile=True)
-            except:
-                if settings.DEBUG:
-                    raise
-                return "A render error has occurred"
+            #Most targetable things follow a predictable pattern to get a
+            #rendered inclusion tag. Construct a template snippet to render it.
+            with context.push():
+                context['tile_target'] = tile.target
+                tag_file = "%s_tags" % tile.target.__module__.split(".")[0]
+                tag_string = '%s "%s"' % (
+                    tile.target.__class__.__name__.lower(),
+                    tile.target.slug)
+                try:
+                    t = template.Template("{%% load %s %%}{%% %s %%}" % (
+                        tag_file,
+                        tag_string))
+                    result = t.render(context)
+                except template.TemplateSyntaxError:
+                    t = template.Template("{%% load %s %%}{%% render_%s %%}" % (
+                        tag_file,
+                        tag_string))
+                    result = t.render(context)
+                return t.render(context)
 
 
 @register.tag
