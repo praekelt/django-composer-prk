@@ -30,14 +30,48 @@ header_footer_posts = [
 
 listings = [
         {
-            "model": "listings.Listing",
-            "pk": 10,
+            "model": "listing.Listing",
+            "pk": 110,
             "title": "Test Listing 1",
+            "slug": "test_listing_1",
             },
         {
-            "model": "listings.Listing",
-            "pk": 20,
+            "model": "listing.Listing",
+            "pk": 120,
             "title": "Test Listing 2",
+            "slug": "test_listing_2",
+            },
+        {
+            "model": "composer.Slot",
+            "pk": 3000,
+            "url": "/test/",
+            "slot_name": "content",
+            "title": "Content Slot",
+            },
+        {
+            "model": "composer.Row",
+            "pk": 3100,
+            "slot_id": 3000,
+            "position": 1,
+            "class_name": "row_3100",
+            },
+        {
+            "model": "composer.Column",
+            "pk": 3110,
+            "title": "column 3110",
+            "row_id": 3100,
+            "width": 12,
+            "position": 1,
+            "class_name": "column_3110",
+            },
+        {
+            "model": "composer.Tile",
+            "pk": 3111,
+            "column_id": 3110,
+            "position": 1,
+            "class_name": "tile_3111",
+            "target_content_type": "listing.Listing",
+            "target_object_id": 110,
             },
         ]
 
@@ -206,4 +240,13 @@ class BasicTestCase(TestCase):
         self.assertContains(response, "Test Post markdown stuff")
 
     def test_listings(self):
-        create_content(composer_header_slots + test_post_data + header_footer_posts)
+        create_content(
+                composer_header_slots +
+                listings +
+                test_post_data +
+                header_footer_posts)
+        response = self.client.get("/")
+        self.assertNotContains(response, "Test Listing 1")
+
+        response = self.client.get("/test/")
+        self.assertContains(response, "Test Listing 1")
