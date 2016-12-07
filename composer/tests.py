@@ -28,7 +28,20 @@ header_footer_posts = [
             },
         ]
 
-composer_slots = [
+listings = [
+        {
+            "model": "listings.Listing",
+            "pk": 10,
+            "title": "Test Listing 1",
+            },
+        {
+            "model": "listings.Listing",
+            "pk": 20,
+            "title": "Test Listing 2",
+            },
+        ]
+
+composer_header_slots = [
         {
             "model": "composer.Slot",
             "pk": 1000,
@@ -70,6 +83,47 @@ composer_slots = [
             },
         ]
 
+composer_footer_slots = [
+        {
+            "model": "composer.Slot",
+            "pk": 2000,
+            "url": "/",
+            "slot_name": "footer",
+            "title": "Homepage Footer slot",
+            },
+        {
+            "model": "composer.Row",
+            "pk": 2100,
+            "slot_id": 2000,
+            "position": 1,
+            "class_name": "row_2100",
+            },
+        {
+            "model": "composer.Row",
+            "pk": 2200,
+            "slot_id": 2000,
+            "position": 2,
+            "class_name": "row_2200",
+            },
+        {
+            "model": "composer.Column",
+            "pk": 2110,
+            "title": "column 2110",
+            "row_id": 2100,
+            "width": 12,
+            "position": 1,
+            "class_name": "column_2110",
+            },
+        {
+            "model": "composer.Tile",
+            "pk": 2111,
+            "column_id": 2110,
+            "position": 1,
+            "class_name": "tile_2111",
+            "target_content_type": "post.Post",
+            "target_object_id": 30,
+            },
+        ]
 
 
 def create_content(data):
@@ -98,6 +152,7 @@ def create_content(data):
 class BasicTestCase(TestCase):
 
     def test_default_slots(self):
+        # Test that the default content slot gets filled
         # Create a post to test against.
         create_content(test_post_data)
 
@@ -114,26 +169,41 @@ class BasicTestCase(TestCase):
         self.assertContains(response, "Test Post markdown stuff")
         self.assertContains(response, "Footer slot:")
 
-    def test_header_footer_content(self):
-        create_content(test_post_data + header_footer_posts)
-        response = self.client.get("/")
-        self.assertEqual(response.status_code, 200)
-        self.assertContains(response, "Header slot:")
-        self.assertContains(response, "Content slot:")
-        self.assertContains(response, "Footer slot:")
-
     def test_header_slots(self):
-        create_content(composer_slots + test_post_data + header_footer_posts)
+        # Creating a header slot should show it on all applicable pages
+        create_content(composer_header_slots + test_post_data + header_footer_posts)
 
         # The header post should show up in the header slot
         response = self.client.get("/")
         self.assertNotContains(response, "Header slot:")
         self.assertContains(response, "Header Post markdown stuff")
+        self.assertNotContains(response, "Test Post markdown stuff")
 
         # And also on the test post page
         response = self.client.get("/post/test-post/")
         self.assertNotContains(response, "Header slot:")
         self.assertContains(response, "Header Post markdown stuff")
+        self.assertContains(response, "Test Post markdown stuff")
 
-    def test_set_stuff(self):
-        pass
+    def test_footer_slots(self):
+        # Make sure that caching does not re-render just the header slot.
+        create_content(
+                composer_header_slots + 
+                composer_footer_slots +
+                test_post_data +
+                header_footer_posts)
+
+        # The header post should show up in the header slot
+        response = self.client.get("/")
+        self.assertNotContains(response, "Footer slot:")
+        self.assertContains(response, "Footer Post markdown stuff")
+        self.assertNotContains(response, "Test Post markdown stuff")
+
+        # And also on the test post page
+        response = self.client.get("/post/test-post/")
+        self.assertNotContains(response, "Footer slot:")
+        self.assertContains(response, "Footer Post markdown stuff")
+        self.assertContains(response, "Test Post markdown stuff")
+
+    def test_listings(self):
+        create_content(composer_header_slots + test_post_data + header_footer_posts)

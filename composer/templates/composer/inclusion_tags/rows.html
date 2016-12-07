@@ -1,7 +1,6 @@
 {% load ultracache_tags composer_tags %}
 
 {% for row in rows %}
-    {% ultracache 3600 'composer_rows' row %} 
         <div class="composer-row {{ row.class_name }}">
             {% for column in row.columns %}
                 <div class="composer-column composer-column-{{ column.width }} {{ column.class_name }}">
@@ -14,6 +13,5 @@
                 </div>
             {% endfor %}
         </div>
-    {% endultracache %}
 
 {% endfor %}
