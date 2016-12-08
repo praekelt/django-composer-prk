@@ -182,6 +182,8 @@ class TileNode(template.Node):
                         tag_string))
                     result = t.render(context)
                 return t.render(context)
+            return "The tile target could not be found"
+        return "The tile could not be rendered"
 
 
 @register.tag

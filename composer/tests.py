@@ -1,6 +1,8 @@
 from django.test import TestCase
 from django.apps import apps
 from django.contrib.contenttypes.models import ContentType
+from listing.models import Listing
+from post.models import Post
 
 
 test_post_data = [{
@@ -34,12 +36,14 @@ listings = [
             "pk": 110,
             "title": "Test Listing 1",
             "slug": "test_listing_1",
+            "style": "Vertical",
             },
         {
             "model": "listing.Listing",
             "pk": 120,
             "title": "Test Listing 2",
             "slug": "test_listing_2",
+            "style": "Vertical",
             },
         {
             "model": "composer.Slot",
@@ -240,13 +244,22 @@ class BasicTestCase(TestCase):
         self.assertContains(response, "Test Post markdown stuff")
 
     def test_listings(self):
+        """
+        We should be able to show listings in the content area on specific
+        urls.
+        """
+        # Set up
         create_content(
                 composer_header_slots +
                 listings +
                 test_post_data +
                 header_footer_posts)
+        Listing.objects.get(pk=110).set_content(Post.objects.all())
+
+        # The listing should NOT show up in the homepage content slot
         response = self.client.get("/")
         self.assertNotContains(response, "Test Listing 1")
 
+        # This URL is for the slot object.
         response = self.client.get("/test/")
         self.assertContains(response, "Test Listing 1")
