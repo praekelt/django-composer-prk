@@ -75,12 +75,26 @@ listings = [
             "column_id": 3110,
             "position": 1,
             "class_name": "tile_3111",
-            "target_content_type": "listing.Listing",
+            "target_content_type": "listing.listing",
             "target_object_id": 110,
             },
         ]
 
 composer_header_slots = [
+        {
+            "model": "navbuilder.menu",
+            "pk": 50,
+            "title": "Test menu",
+            "slug": "test_menu",
+            },
+        {
+            "model": "navbuilder.MenuItem",
+            "pk": 51,
+            "title": "Menu Item 1",
+            "slug": "menu_item_1",
+            "position": "1",
+            "menu_id": 50,
+            },
         {
             "model": "composer.Slot",
             "pk": 1000,
@@ -117,8 +131,8 @@ composer_header_slots = [
             "column_id": 1110,
             "position": 1,
             "class_name": "tile_1111",
-            "target_content_type": "post.Post",
-            "target_object_id": 20,
+            "target_content_type": "navbuilder.menu",
+            "target_object_id": 50,
             },
         ]
 
@@ -159,7 +173,7 @@ composer_footer_slots = [
             "column_id": 2110,
             "position": 1,
             "class_name": "tile_2111",
-            "target_content_type": "post.Post",
+            "target_content_type": "post.post",
             "target_object_id": 30,
             },
         ]
@@ -182,7 +196,7 @@ def create_content(data):
                 isinstance(item["target_content_type"], str):
             target_app, target_model = item["target_content_type"].split(".")
             item["target_content_type"] = ContentType.objects.get(
-                    app_label=target_app, model=target_app)
+                    app_label=target_app, model=target_model)
 
         obj = model.objects.create(**item)
         obj.sites = [1]
@@ -212,16 +226,16 @@ class BasicTestCase(TestCase):
         # Creating a header slot should show it on all applicable pages
         create_content(composer_header_slots + test_post_data + header_footer_posts)
 
-        # The header post should show up in the header slot
+        # The test menu should show up in the header slot
         response = self.client.get("/")
         self.assertNotContains(response, "Header slot:")
-        self.assertContains(response, "Header Post markdown stuff")
+        self.assertContains(response, "Menu Item 1")
         self.assertNotContains(response, "Test Post markdown stuff")
 
         # And also on the test post page
         response = self.client.get("/post/test-post/")
         self.assertNotContains(response, "Header slot:")
-        self.assertContains(response, "Header Post markdown stuff")
+        self.assertContains(response, "Menu Item 1")
         self.assertContains(response, "Test Post markdown stuff")
 
     def test_footer_slots(self):
@@ -232,7 +246,7 @@ class BasicTestCase(TestCase):
                 test_post_data +
                 header_footer_posts)
 
-        # The header post should show up in the header slot
+        # The test menu post should show up in the header slot
         response = self.client.get("/")
         self.assertNotContains(response, "Footer slot:")
         self.assertContains(response, "Footer Post markdown stuff")
@@ -284,14 +298,15 @@ class BasicTestCase(TestCase):
         # The listing should show up in the homepage content slot
         response = self.client.get("/")
         self.assertContains(response, "Test Listing 1")
-        self.assertContains(response, "Header Post markdown stuff")
+        self.assertContains(response, "Menu Item 1")
 
         # but not on an object detail url
         response = self.client.get("/post/test-post/")
         self.assertNotContains(response, "Test Listing 1")
-        self.assertContains(response, "Header Post markdown stuff")
+        self.assertContains(response, "Menu Item 1")
 
         # A nonexistent page should return 404
         response = self.client.get("/test/")
         self.assertNotContains(response, "Test Listing 1", status_code=404)
         # TODO: The 404 page should still show the header and footer slots.
+        # This depends on a 404 page that extends base.html
