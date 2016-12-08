@@ -3,6 +3,7 @@ from django.apps import apps
 from django.contrib.contenttypes.models import ContentType
 from listing.models import Listing
 from post.models import Post
+from composer.models import Slot
 
 
 test_post_data = [{
@@ -263,3 +264,34 @@ class BasicTestCase(TestCase):
         # This URL is for the slot object.
         response = self.client.get("/test/")
         self.assertContains(response, "Test Listing 1")
+
+    def test_404(self):
+        """
+        Setting a content slot on the home page could potentially override 404
+        or object detail pages everywhere on the site.
+        """
+        # Set up
+        create_content(
+                composer_header_slots +
+                listings +
+                test_post_data +
+                header_footer_posts)
+        Listing.objects.get(pk=110).set_content(Post.objects.all())
+        slot = Slot.objects.get(pk=3000)
+        slot.url = "/"
+        slot.save()
+
+        # The listing should show up in the homepage content slot
+        response = self.client.get("/")
+        self.assertContains(response, "Test Listing 1")
+        self.assertContains(response, "Header Post markdown stuff")
+
+        # but not on an object detail url
+        response = self.client.get("/post/test-post/")
+        self.assertNotContains(response, "Test Listing 1")
+        self.assertContains(response, "Header Post markdown stuff")
+
+        # A nonexistent page should return 404
+        response = self.client.get("/test/")
+        self.assertNotContains(response, "Test Listing 1", status_code=404)
+        # TODO: The 404 page should still show the header and footer slots.
