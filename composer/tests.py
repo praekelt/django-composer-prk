@@ -4,7 +4,7 @@ from django.test import TestCase
 from listing.models import Listing
 from post.models import Post
 
-from .composer.models import Slot
+from .models import Slot
 
 test_post_data = [{
         "model": "post.Post",

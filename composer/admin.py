@@ -36,6 +36,7 @@ class SlotAdminForm(forms.ModelForm):
         need to get the field choices from the base template. Doing this in the
         model init is wasteful, as we only need this when doing an admin edit.
         Also, it leads to circular imports.
+        An alternative could be to use the django.utils function lazy.
         """
         super(SlotAdminForm, self).__init__(*args, **kwargs)
 
