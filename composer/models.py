@@ -16,6 +16,8 @@ from jmbo.managers import DefaultManager, PermittedManager
 # TODO: Make sure slot is unique per url and site
 from composer import SETTINGS as app_settings
 
+
+
 class AttributeWrapper:
     """
     Wrapper that allows attributes to be added or overridden on an object.
@@ -60,13 +62,6 @@ with a slash. Example: '/about-us/people/'"),
     # TODO: Add field with options to pick from a range of urlconf regexes.
     slot_name = models.CharField(
         max_length=32,
-        default="content",
-        # TODO: Derive this from base template nodes.
-        choices=(
-            ("header", _("Header")),
-            ("content", _("Content")),
-            ("footer", _("Footer")),
-        ),
         help_text="Which base template slot should this be rendered in?"
     )
     title = models.CharField(
