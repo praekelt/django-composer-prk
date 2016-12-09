@@ -10,13 +10,12 @@ from django.core.urlresolvers import get_script_prefix
 from django.core.validators import MaxValueValidator, MinValueValidator
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
-
 from jmbo.managers import DefaultManager, PermittedManager
 
+from . import SETTINGS as app_settings
+
+
 # TODO: Make sure slot is unique per url and site
-from composer import SETTINGS as app_settings
-
-
 
 class AttributeWrapper:
     """

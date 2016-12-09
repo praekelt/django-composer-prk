@@ -1,10 +1,10 @@
-from django.test import TestCase
 from django.apps import apps
 from django.contrib.contenttypes.models import ContentType
+from django.test import TestCase
 from listing.models import Listing
 from post.models import Post
-from composer.models import Slot
 
+from .composer.models import Slot
 
 test_post_data = [{
         "model": "post.Post",

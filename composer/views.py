@@ -1,8 +1,9 @@
-from django.http import Http404
-from django.views.generic.detail import DetailView
-from .models import Slot
-from django.shortcuts import render
 from django.contrib.sites.shortcuts import get_current_site
+from django.http import Http404
+from django.shortcuts import render
+from django.views.generic.detail import DetailView
+
+from .models import Slot
 
 
 class SlotView(DetailView):

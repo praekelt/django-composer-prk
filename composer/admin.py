@@ -1,11 +1,11 @@
 from django import forms
 from django.contrib import admin
+from django.template import loader
+
 import nested_admin
 
-from .models import Slot, Row, Column, Tile
-
-from django.template import loader
-from templatetags.composer_tags import ComposerNode
+from .models import Column, Row, Slot, Tile
+from .templatetags.composer_tags import ComposerNode
 
 
 class TileInline(nested_admin.NestedTabularInline):
