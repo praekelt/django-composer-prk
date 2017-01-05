@@ -51,7 +51,6 @@ class SlotAdminForm(forms.ModelForm):
         if slot_name_choices:
             initial = slot_name_choices[0][0]
             for i,j in slot_name_choices:
-                print i
                 if i == "content":
                     initial = i
 
