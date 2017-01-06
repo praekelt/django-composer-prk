@@ -8,7 +8,13 @@ from django.core.cache import cache
 from django.core.urlresolvers import NoReverseMatch, resolve, reverse
 from django.template.loader import render_to_string
 from django.template.response import TemplateResponse
-from jmbo.templatetags.jmbo_inclusion_tags import RenderObjectNode
+
+# We use the special shortcut for jmbo objects
+try:
+    from jmbo.templatetags.jmbo_inclusion_tags import RenderObjectNode
+    has_jmbo = True
+except ImportError:
+    has_jmbo = False
 
 from .. import SETTINGS as app_settings
 from ..models import Row
@@ -140,8 +146,7 @@ class TileNode(template.Node):
             return html
 
         if tile.target:
-            # Use the RenderObjectNode shortcut for modelbase objects
-            if hasattr(tile.target, "modelbase_obj"):
+            if has_jmbo and hasattr(tile.target, "modelbase_obj"):
                 with context.push():
                     context['tile_target'] = tile.target
                     return RenderObjectNode("tile_target", "detail")\
