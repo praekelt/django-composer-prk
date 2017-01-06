@@ -13,7 +13,6 @@ setup(
     packages = find_packages(),
     install_requires = [
         # Redundant. Pip handles this now.
-        "jmbo",
         "django-nested-admin",
         "BeautifulSoup",
     ],
