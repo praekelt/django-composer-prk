@@ -13,24 +13,6 @@ from jmbo.templatetags.jmbo_inclusion_tags import RenderObjectNode
 from .. import SETTINGS as app_settings
 from ..models import Row
 
-"""
-import types
-import hashlib
-import re
-
-
-from django import template
-from django.http import HttpResponse, Http404
-from django.core.paginator import Paginator, InvalidPage
-from django.contrib.sites.models import get_current_site
-
-from pagination.templatetags.pagination_tags import DEFAULT_PAGINATION, \
-    DEFAULT_ORPHANS, INVALID_PAGE_RAISES_404
-
-from foundry.models import Menu, Navbar, Listing, Page, Member
-from foundry.templatetags.listing_styles import LISTING_MAP
-"""
-
 register = template.Library()
 
 
