@@ -6,6 +6,7 @@ try:
     from jmbo.managers import PermittedManager as JmboPermittedManager
     has_jmbo = True
 except ImportError:
+    from django.db.models import Manager as DefaultManager
     has_jmbo = False
 
 try:
