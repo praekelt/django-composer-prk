@@ -145,7 +145,7 @@ class TileNode(template.Node):
             # No content div found
             return html
 
-        if tile.target:
+        if tile.target is not None:
             if has_jmbo and hasattr(tile.target, "modelbase_obj"):
                 with context.push():
                     context['tile_target'] = tile.target
