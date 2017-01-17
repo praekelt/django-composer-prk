@@ -10,16 +10,21 @@ def slots(request):
     """
 
     # TODO: caching
-    # TODO: Generalize to containing paths and/or urlconf regexes.
+    # TODO: Generalize to use urlconf regexes as well.
     url = request.path_info
-    # TODO: This can be recursively rolled up to the root url
-    url_slots = list(Slot.objects.filter(url=url))
-    # TODO: This can be cached separately, since it's the same for all urls.
-    base_slots = list(Slot.objects.filter(url="/"))
+    url_parts = [part for part in url.split("/") if part]
+    reconstructed_url = "/"
 
-    base_slots.extend(url_slots)
+    # Traverse down the url 'folder' structure, collecting slots
+    url_slots = list(Slot.objects.filter(url="/"))
+    for part in url_parts:
+        reconstructed_url += "%s/" % part
+        url_slots.extend(list(Slot.objects.filter(url=reconstructed_url)))
+
+    # Last slot (most specific url) in the url_slots list wins.
     slots = {}
-    for slot in base_slots:
+    for slot in url_slots:
         slots[slot.slot_name] = slot
 
+    print slots
     return {"composer_slots": slots}
