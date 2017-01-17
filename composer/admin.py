@@ -52,6 +52,7 @@ class SlotAdminForm(forms.ModelForm):
         # Set the choices and initial value
         self.fields["slot_name"] = forms.ChoiceField(
                 help_text=slot_name_help,
+                label="Slot Position",
                 choices=slot_name_choices)
 
         # Find a sensible initial value. Prefer "content"
