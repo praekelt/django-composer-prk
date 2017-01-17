@@ -8,28 +8,16 @@ from django.core.cache import cache
 from django.core.urlresolvers import NoReverseMatch, resolve, reverse
 from django.template.loader import render_to_string
 from django.template.response import TemplateResponse
-from jmbo.templatetags.jmbo_inclusion_tags import RenderObjectNode
+
+# We use the special shortcut for jmbo objects
+try:
+    from jmbo.templatetags.jmbo_inclusion_tags import RenderObjectNode
+    has_jmbo = True
+except ImportError:
+    has_jmbo = False
 
 from .. import SETTINGS as app_settings
 from ..models import Row
-
-"""
-import types
-import hashlib
-import re
-
-
-from django import template
-from django.http import HttpResponse, Http404
-from django.core.paginator import Paginator, InvalidPage
-from django.contrib.sites.models import get_current_site
-
-from pagination.templatetags.pagination_tags import DEFAULT_PAGINATION, \
-    DEFAULT_ORPHANS, INVALID_PAGE_RAISES_404
-
-from foundry.models import Menu, Navbar, Listing, Page, Member
-from foundry.templatetags.listing_styles import LISTING_MAP
-"""
 
 register = template.Library()
 
@@ -157,9 +145,8 @@ class TileNode(template.Node):
             # No content div found
             return html
 
-        if tile.target:
-            # Use the RenderObjectNode shortcut for modelbase objects
-            if hasattr(tile.target, "modelbase_obj"):
+        if tile.target is not None:
+            if has_jmbo and hasattr(tile.target, "modelbase_obj"):
                 with context.push():
                     context['tile_target'] = tile.target
                     return RenderObjectNode("tile_target", "detail")\

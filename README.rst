@@ -1,12 +1,12 @@
-Jmbo Composer
+Django Composer
 =============
 **Build Pages by composing listings and individual content**
 
-.. image:: https://travis-ci.org/praekelt/django-composer.svg?branch=develop
-    :target: https://travis-ci.org/praekelt/django-composer
+.. image:: https://travis-ci.org/praekelt/django-composer-prk.svg?branch=develop
+    :target: https://travis-ci.org/praekelt/django-composer-prk
 
-.. image:: https://coveralls.io/repos/github/praekelt/django-composer/badge.svg?branch=develop
-    :target: https://coveralls.io/github/praekelt/django-composer?branch=develop
+.. image:: https://coveralls.io/repos/github/praekelt/django-composer-prk/badge.svg?branch=develop
+    :target: https://coveralls.io/github/praekelt/django-composer-prk?branch=develop
 
 .. contents:: Contents
     :depth: 5
@@ -14,7 +14,7 @@ Jmbo Composer
 Installation
 ------------
 
-#. Install or add ``django-composer`` to your pip requirements.
+#. Install or add ``django-composer-prk`` to your pip requirements.
 
 #. Add ``composer`` to your ``INSTALLED_APPS`` setting.
 
