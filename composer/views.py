@@ -14,7 +14,7 @@ class SlotView(DetailView):
         url = self.request.path_info
         site_id = get_current_site(self.request).id
         # TODO: Should this be permitted instead of objects?
-        page = Slot.objects.filter(url=url, sites=site_id)
+        page = Slot.objects.filter(url=url, sites=site_id, slot_name="content")
         if page:
             return page
 
