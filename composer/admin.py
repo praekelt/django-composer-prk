@@ -46,14 +46,6 @@ class SlotAdminForm(forms.ModelForm):
         slot_name_choices = [[i.slot_name, i.slot_name]
                 for i in composer_nodes]
 
-        # Find a sensible initial value. Prefer "content"
-        initial = ""
-        if slot_name_choices:
-            initial = slot_name_choices[0][0]
-            for i,j in slot_name_choices:
-                if i == "content":
-                    initial = i
-
         # The help text on the widget needs to be carried over.
         slot_name_help = self.fields["slot_name"].help_text
 
@@ -61,7 +53,16 @@ class SlotAdminForm(forms.ModelForm):
         self.fields["slot_name"] = forms.ChoiceField(
                 help_text=slot_name_help,
                 choices=slot_name_choices)
-        self.initial["slot_name"] = initial
+
+        # Find a sensible initial value. Prefer "content"
+        # If instance is in kwargs, we already have a choice, so ignore.
+        if "instance" not in kwargs and slot_name_choices:
+            initial = slot_name_choices[0][0]
+            for i,j in slot_name_choices:
+                if i == "content":
+                    initial = i
+
+            self.initial["slot_name"] = initial
 
 
 class SlotAdmin(nested_admin.NestedModelAdmin):
