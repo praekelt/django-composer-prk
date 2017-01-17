@@ -26,5 +26,4 @@ def slots(request):
     for slot in url_slots:
         slots[slot.slot_name] = slot
 
-    print slots
     return {"composer_slots": slots}
