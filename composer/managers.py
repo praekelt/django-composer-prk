@@ -17,7 +17,8 @@ except ImportError:
 
 
 class ComposerPermittedManager(models.Manager):
-    """Get site from request if available, otherwise default."""
+    """Get site from request if available, otherwise default.
+    """
 
     def get_queryset(self):
         queryset = super(ComposerPermittedManager, self).get_queryset()
