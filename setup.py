@@ -12,7 +12,9 @@ setup(
     url="https://github.com/praekelt/django-composer-prk",
     packages = find_packages(),
     install_requires = [
+        "django-crum",
         "django-nested-admin",
+        "django-ultracache",
         "BeautifulSoup", # use bs4
     ],
     include_package_data=True,

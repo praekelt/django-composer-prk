@@ -1,24 +1,24 @@
-from django.contrib.sites.shortcuts import get_current_site
-from django.http import Http404
-from django.shortcuts import render
+from django.shortcuts import get_object_or_404
 from django.views.generic.detail import DetailView
 
-from .models import Slot
+from composer.models import Slot
 
 
 class SlotView(DetailView):
+    """The slot detail view is only applicable to slots with slot_name
+    "content".
+    """
+
     model = Slot
 
     def get_object(self):
-        """Get the Slot based on the URL"""
+        # Return the slot based on the path
         url = self.request.path_info
-        site_id = get_current_site(self.request).id
-        # TODO: Should this be permitted instead of objects?
-        page = Slot.objects.filter(url=url, sites=site_id, slot_name="content")
-        if page:
-            return page
-
-        raise Http404("Slot does not exist")
+        return get_object_or_404(
+            Slot.permitted,
+            url=self.request.path_info,
+            slot_name="content"
+        )
 
     def post(self, request, *args, **kwargs):
         return self.get(request, *args, **kwargs)

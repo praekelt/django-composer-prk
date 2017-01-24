@@ -6,7 +6,7 @@ from django.core.validators import MaxValueValidator, MinValueValidator
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
 
-from composer.managers import DefaultManager, PermittedManager
+from composer.managers import PermittedManager
 
 
 # TODO: Make sure slot is unique per url and site
@@ -70,7 +70,7 @@ limited to one or two sentences."),
         blank=True,
     )
 
-    objects = DefaultManager()
+    objects = models.Manager()
     permitted = PermittedManager()
 
     def __unicode__(self):
@@ -224,17 +224,19 @@ class Tile(models.Model):
         max_length=200,
         help_text="""A view to be rendered in this tile. This view is \
 typically a snippet of a larger page. If you are unsure test and see if \
-it works - you cannot break anything.""",
+it works. If this value is set it has precedence over target.""",
         null=True,
         blank=True
     )
 
     style = models.CharField(
         max_length=200,
-        help_text="Display style. This corresponds to a listing or object \
-style template.",
+        default="tile",
+        help_text="""The style of template that is used to render the item \
+inside the tile if target is set.""",
         null=True,
         blank=True,
+        # todo: choices
     )
 
     class_name = models.CharField(
@@ -246,4 +248,4 @@ style template.",
 
     @property
     def label(self):
-        return str(self.target or self.view_name)
+        return str(self.view_name or self.target)
