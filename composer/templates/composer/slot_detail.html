@@ -1,2 +1,15 @@
 {% extends "base.html" %}
-{% comment %}If the base template fills the content slot with a slots pattern like the other slots, this will just work.{% endcomment %}
+
+{% comment %}
+
+    The base template must have a block similar to below for this template to work.
+
+    {% block content %}
+        {% if composer_slots.content %}
+            {% composer content %}
+        {% else %}
+            Content slot: to populate this, add a content slot with url '/'
+        {% endif %}
+    {% endblock %}
+
+{% endcomment %}

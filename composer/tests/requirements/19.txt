@@ -1,0 +1,5 @@
+Django==1.9.6
+django-nested-admin
+BeautifulSoup
+six==1.10.0
+django-crum==0.7.1

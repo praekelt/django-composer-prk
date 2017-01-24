@@ -166,6 +166,7 @@ class TileNode(template.Node):
                         tag_string))
                     result = t.render(context)
                 except template.TemplateSyntaxError:
+                    print tag_file, tag_string
                     t = template.Template("{%% load %s %%}{%% render_%s %%}" % (
                         tag_file,
                         tag_string))

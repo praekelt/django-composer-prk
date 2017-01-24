@@ -4,8 +4,8 @@ from django.template import loader
 
 import nested_admin
 
-from .models import Column, Row, Slot, Tile
-from .templatetags.composer_tags import ComposerNode
+from composermodels import Column, Row, Slot, Tile
+from composertemplatetags.composer_tags import ComposerNode
 
 
 class TileInline(nested_admin.NestedTabularInline):
@@ -26,6 +26,7 @@ class RowInline(nested_admin.NestedTabularInline):
     sortable_field_name = "position"
     inlines = [ColumnInline]
     extra = 0
+
 
 class SlotAdminForm(forms.ModelForm):
     model = Slot

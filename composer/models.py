@@ -10,17 +10,13 @@ from django.core.urlresolvers import get_script_prefix
 from django.core.validators import MaxValueValidator, MinValueValidator
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
-from .managers import DefaultManager, PermittedManager
-
-from . import SETTINGS as app_settings
+from composer.managers import DefaultManager, PermittedManager
 
 
 # TODO: Make sure slot is unique per url and site
 
 class AttributeWrapper:
-    """
-    Wrapper that allows attributes to be added or overridden on an object.
-
+    """Wrapper that allows attributes to be added or overridden on an object.
     Copied from jmbo-foundry.
     """
 
@@ -40,16 +36,15 @@ class AttributeWrapper:
 
     @property
     def klass(self):
-        """
-        Can't override __class__ and making it a property also does not work.
-        Could be because of Django metaclasses.
+        """Can't override __class__ and making it a property also does not
+        work. Could be because of Django metaclasses.
         """
         return self._obj.__class__
 
 
 class Slot(models.Model):
     url = models.CharField(
-        _('URL'),
+        _("URL"),
         max_length=100,
         default="/",
         db_index=True,
@@ -89,22 +84,17 @@ limited to one or two sentences."),
     def get_absolute_url(self):
         # Taken from flatpages
         # Handle script prefix manually because we bypass reverse()
-        return iri_to_uri(get_script_prefix().rstrip('/') + self.url)
+        return iri_to_uri(get_script_prefix().rstrip("/") + self.url)
 
     @property
     def rows(self):
+        """Fetch rows, columns and tiles in a single query
         """
-        Fetch rows, columns and tiles in a single query
-        """
-
-        key = "composer-slot-rows-%s" % self.id
-        cached = cache.get(key, None)
-        if cached:
-            return cPickle.loads(cached)
 
         # Organize into a structure
-        tiles = Tile.objects.select_related().filter(column__row__slot=self)\
-                .order_by("position")
+        tiles = Tile.objects.select_related().filter(
+            column__row__slot=self
+        ).order_by("position")
         struct = {}
         for tile in tiles:
             row = tile.column.row
@@ -127,8 +117,6 @@ limited to one or two sentences."),
                 column_objs.append(AttributeWrapper(
                     column, tiles=struct[row][column]))
             result.append(AttributeWrapper(row, columns=column_objs))
-
-        cache.set(key, cPickle.dumps(result),app_settings["layout_cache_time"])
 
         return result
 

@@ -19,3 +19,6 @@ class SlotView(DetailView):
             return page
 
         raise Http404("Slot does not exist")
+
+    def post(self, request, *args, **kwargs):
+        return self.get(request, *args, **kwargs)

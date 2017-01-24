@@ -50,7 +50,7 @@ Column:
 
 * Each column is nested within a row (ordered)
 
-* width: A row is 12 columns wide, so columns can be fitted next to each other. 
+* width: A row is 12 columns wide, so columns can be fitted next to each other.
 
 * title: rendered at the top of a column. Can be blank.
 
@@ -85,10 +85,11 @@ On any url on the site, if an appropriate slot exists that matches the url and s
 
 #. If there is a slot with an url matching the exact current url and a slot name matching the slot on the page, it will be rendered.
 
-#. If there is a slot with the url ``/`` and a slot name matching the slot on the page, it will be rendered. 
+#. If there is a slot with the url ``/`` and a slot name matching the slot on the page, it will be rendered.
 
 The content slot is special:
 
 #. Current content overrides the ``content`` slot: Any object that fills the ``content`` block will be rendered in the content block. This includes any modelbase object that will normally be rendered at that url.
 
 #. A slot with a slot name of ``content`` and an url of ``/`` will serve as the content for the home page of the site. However, it will **NOT** be rendered on any other page, allowing a fallback to flatpages and the normal 404 page.
+
