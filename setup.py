@@ -12,9 +12,8 @@ setup(
     url="https://github.com/praekelt/django-composer-prk",
     packages = find_packages(),
     install_requires = [
-        # Redundant. Pip handles this now.
         "django-nested-admin",
-        "BeautifulSoup",
+        "BeautifulSoup", # use bs4
     ],
     include_package_data=True,
     classifiers=[

@@ -1,15 +1,11 @@
-import cPickle
-import inspect
-import re
-
 from django.conf import settings
 from django.contrib.contenttypes.fields import GenericForeignKey
 from django.contrib.contenttypes.models import ContentType
-from django.core.cache import cache
 from django.core.urlresolvers import get_script_prefix
 from django.core.validators import MaxValueValidator, MinValueValidator
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
+
 from composer.managers import DefaultManager, PermittedManager
 
 
@@ -230,7 +226,7 @@ class Tile(models.Model):
 typically a snippet of a larger page. If you are unsure test and see if \
 it works - you cannot break anything.""",
         null=True,
-        blank=True,
+        blank=True
     )
 
     style = models.CharField(

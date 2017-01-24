@@ -4,14 +4,29 @@ from django.template import loader
 
 import nested_admin
 
-from composermodels import Column, Row, Slot, Tile
-from composertemplatetags.composer_tags import ComposerNode
+from composer.models import Column, Row, Slot, Tile
+from composer.templatetags.composer_tags import ComposerNode
+from composer.utils import get_view_choices
+
+
+class TileInlineForm(forms.ModelForm):
+
+    class Meta:
+        model = Tile
+        fields = "__all__"
+
+    def __init__(self, *args, **kwargs):
+        super(TileInlineForm, self).__init__(*args, **kwargs)
+        self.fields['view_name'].widget = forms.widgets.Select(
+            choices=[("", "")] + get_view_choices()
+        )
 
 
 class TileInline(nested_admin.NestedTabularInline):
     model = Tile
     sortable_field_name = "position"
     extra = 0
+    form = TileInlineForm
 
 
 class ColumnInline(nested_admin.NestedTabularInline):
@@ -32,12 +47,12 @@ class SlotAdminForm(forms.ModelForm):
     model = Slot
 
     def __init__(self, *args, **kwargs):
-        """
-        Manipulate the form to provide a choice field for the slot name. We
+        """ Manipulate the form to provide a choice field for the slot name. We
         need to get the field choices from the base template. Doing this in the
         model init is wasteful, as we only need this when doing an admin edit.
-        Also, it leads to circular imports.
-        An alternative could be to use the django.utils function lazy.
+
+        Also, it leads to circular imports.  An alternative could be to use the
+        django.utils function lazy.
         """
         super(SlotAdminForm, self).__init__(*args, **kwargs)
 
@@ -52,15 +67,16 @@ class SlotAdminForm(forms.ModelForm):
 
         # Set the choices and initial value
         self.fields["slot_name"] = forms.ChoiceField(
-                help_text=slot_name_help,
-                label="Slot Position",
-                choices=slot_name_choices)
+            help_text=slot_name_help,
+            label="Slot Position",
+            choices=slot_name_choices
+        )
 
-        # Find a sensible initial value. Prefer "content"
-        # If instance is in kwargs, we already have a choice, so ignore.
+        # Find a sensible initial value. Prefer "content".  If instance is in
+        # kwargs, we already have a choice, so ignore.
         if "instance" not in kwargs and slot_name_choices:
             initial = slot_name_choices[0][0]
-            for i,j in slot_name_choices:
+            for i, j in slot_name_choices:
                 if i == "content":
                     initial = i
 

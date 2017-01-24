@@ -16,8 +16,7 @@ try:
 except ImportError:
     has_jmbo = False
 
-from .. import SETTINGS as app_settings
-from ..models import Row
+from composer.models import Row
 
 register = template.Library()
 
