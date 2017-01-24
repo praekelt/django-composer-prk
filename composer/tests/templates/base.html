@@ -1,0 +1,27 @@
+{% if composer_slots %}
+    {% load composer_tags %}
+{% endif %}
+
+<div id="header">
+    {% if composer_slots.header %}
+        {% composer header %}
+    {% else %}
+        Header slot
+    {% endif %}
+</div>
+<div id="content">
+    {% block content %}
+    {% if composer_slots.content %}
+        {% composer content %}
+    {% else %}
+        Content slot
+    {% endif %}
+    {% endblock %}
+</div>
+<div id="footer">
+    {% if composer_slots.footer %}
+        {% composer footer %}
+    {% else %}
+        Footer slot
+    {% endif %}
+</div>

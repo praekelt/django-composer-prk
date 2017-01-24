@@ -42,14 +42,13 @@ class Slot(models.Model):
     url = models.CharField(
         _("URL"),
         max_length=100,
-        default="/",
+        default="^/$",
         db_index=True,
-        help_text=_("Where on the site this slot will appear. Start and end \
-with a slash. Example: '/about-us/people/'"),
+        help_text=_("""Where on the site this slot will appear. This value
+requires a regular expression and may be very complex. A simple example is
+^/about-us/, which means any URL starting with /about-us/ will have this slot."""
+        ),
     )
-    # TODO: Add option to also render on all urls below this one. For now,
-    # that defaults to True.
-    # TODO: Add field with options to pick from a range of urlconf regexes.
     slot_name = models.CharField(
         max_length=32,
         help_text="Which base template slot should this be rendered in?"
@@ -78,8 +77,8 @@ limited to one or two sentences."),
         return "%s -- %s" % (self.url, self.title)
 
     def get_absolute_url(self):
-        # Taken from flatpages
-        # Handle script prefix manually because we bypass reverse()
+        # Taken from flatpages. Handle script prefix manually because we
+        # bypass reverse().
         return iri_to_uri(get_script_prefix().rstrip("/") + self.url)
 
     @property
@@ -114,19 +113,6 @@ limited to one or two sentences."),
                     column, tiles=struct[row][column]))
             result.append(AttributeWrapper(row, columns=column_objs))
 
-        return result
-
-    @property
-    def rows_admin(self):
-        return self.row_set.all().order_by("position")
-
-    @property
-    def rows_by_block_name(self):
-        """Return rows grouped by block_name."""
-        result = {}
-        for row in self.rows:
-            result.setdefault(row.block_name, [])
-            result[row.block_name].append(row)
         return result
 
 
@@ -165,9 +151,7 @@ class Row(models.Model):
 
 class Column(models.Model):
     row = models.ForeignKey(Row)
-
     position = models.PositiveIntegerField(default=0)
-
     width = models.PositiveIntegerField(
         default=8,
         validators = [
@@ -175,14 +159,12 @@ class Column(models.Model):
             MinValueValidator(1),
         ]
     )
-
     title = models.CharField(
         max_length=256,
         help_text="The title is rendered at the top of a column.",
         null=True,
         blank=True,
     )
-
     class_name = models.CharField(
         max_length=200,
         help_text="One or more CSS classes that are applied to the column.",
@@ -196,30 +178,25 @@ class Column(models.Model):
 
 
 class Tile(models.Model):
+    """A block tile that renders a view or an object.
     """
-    A block tile that can hold a listing or content item.
-    """
+
     column = models.ForeignKey(Column)
-
     position = models.PositiveIntegerField(default=0)
-
     target_content_type = models.ForeignKey(
         ContentType,
         related_name="tile_target_content_type",
         null=True,
         blank=True,
     )
-
     target_object_id = models.PositiveIntegerField(
         null=True,
         blank=True,
     )
-
     target = GenericForeignKey(
         "target_content_type",
         "target_object_id",
     )
-
     view_name = models.CharField(
         max_length=200,
         help_text="""A view to be rendered in this tile. This view is \
@@ -228,17 +205,14 @@ it works. If this value is set it has precedence over target.""",
         null=True,
         blank=True
     )
-
     style = models.CharField(
         max_length=200,
         default="tile",
         help_text="""The style of template that is used to render the item \
 inside the tile if target is set.""",
         null=True,
-        blank=True,
-        # todo: choices
+        blank=True
     )
-
     class_name = models.CharField(
         max_length=200,
         help_text="One or more CSS classes that are applied to the tile.",

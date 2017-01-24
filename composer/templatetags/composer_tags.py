@@ -52,7 +52,7 @@ class ComposerNode(template.Node):
         if rows:
             # We have customized rows for the block. Use them.
             return render_to_string(
-                "composer/inclusion_tags/rows.html",
+                "composer/inclusion_tags/composer.html",
                 context={"rows":rows},
                 request=request
             )

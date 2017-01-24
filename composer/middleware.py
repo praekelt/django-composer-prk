@@ -1,7 +1,8 @@
 from django.conf import settings
 from django.http import Http404
 
-from .views import SlotView
+from composer.views import SlotView
+
 
 if "flatpages" in settings.INSTALLED_APPS:
     from django.contrib.flatpages.views import flatpage
@@ -10,6 +11,7 @@ if "flatpages" in settings.INSTALLED_APPS:
 class ComposerFallbackMiddleware(object):
     """Combine composer slot and flatpage fallbacks.
     """
+
     def process_response(self, request, response):
         # Composer pages and flatpages only render on 404
         if response.status_code != 404:

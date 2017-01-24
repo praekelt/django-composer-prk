@@ -1,5 +1,7 @@
-Django==1.9.6
-django-nested-admin
 BeautifulSoup
-six==1.10.0
+Django==1.9.6
 django-crum==0.7.1
+django-nested-admin
+django-ultracache
+six==1.10.0
+psycopg2

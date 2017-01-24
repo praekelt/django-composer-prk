@@ -4,6 +4,7 @@
 
     The base template must have a block similar to below for this template to work.
 
+    <div id="content">
     {% block content %}
         {% if composer_slots.content %}
             {% composer content %}
@@ -11,5 +12,6 @@
             Content slot: to populate this, add a content slot with url '/'
         {% endif %}
     {% endblock %}
+    </div>
 
 {% endcomment %}

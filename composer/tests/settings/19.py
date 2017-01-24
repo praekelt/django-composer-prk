@@ -1,14 +1,10 @@
 import os
 
 
-xUSE_TZ = True
-
-xTIME_ZONE = "Africa/Johannesburg"
-
-xDATABASES = {
+DATABASES = {
     "default": {
         "ENGINE": "django.db.backends.postgresql",
-        "NAME": "jmbo",
+        "NAME": "test",
         "USER": "postgres",
         "PASSWORD": "",
         "HOST": "",
@@ -17,6 +13,9 @@ xDATABASES = {
 }
 
 INSTALLED_APPS = (
+    "composer.tests",
+    "composer",
+    "ultracache",
     "django.contrib.admin",
     "django.contrib.auth",
     "django.contrib.contenttypes",
@@ -24,7 +23,7 @@ INSTALLED_APPS = (
     "django.contrib.sites",
 )
 
-ROOT_URLCONF = "composer.urls"
+ROOT_URLCONF = "composer.tests.urls"
 
 MIDDLEWARE_CLASSES = (
     "django.middleware.common.CommonMiddleware",
