@@ -81,18 +81,24 @@ class TileNode(template.Node):
     def __init__(self, tile):
         self.tile = template.Variable(tile)
 
-    def _render_url(self, context, url):
+    def _render_url(self, context, tile, url):
         """Helper method that safely renders a view looked up from a URL."""
 
         request = context["request"]
         view, args, kwargs = resolve(url)
+
+        # Construct a final kwargs that includes the context
+        final_kwargs = context.flatten()
+        del final_kwargs["request"]
+        final_kwargs.update(kwargs)
+        final_kwargs["tile"] = tile
 
         # Set recursion guard flag
         setattr(request, "_composer_suppress_rows_tag", 1)
         html = ""
 
         # Call the view. Let any error propagate.
-        result = view(request, *args, **kwargs)
+        result = view(request, *args, **final_kwargs)
         if isinstance(result, TemplateResponse):
             # The result of a class based view
             result.render()
@@ -129,7 +135,7 @@ class TileNode(template.Node):
                 url = reverse(tile.view_name)
             except NoReverseMatch:
                 return "No reverse match for %s" % tile.view_name
-            return self._render_url(context, url)
+            return self._render_url(context, tile, url)
 
         if tile.target:
 
@@ -163,6 +169,6 @@ class TileNode(template.Node):
             # We couldn't find a suitable template. Attempt get_absolute_url.
             url = getattr(tile.target, "get_absolute_url", lambda: None)()
             if url:
-                return self._render_url(context, url)
+                return self._render_url(context, tile, url)
 
         return "The tile could not be rendered"
