@@ -1,4 +1,6 @@
+sudo: false
 language: python
+cache: pip
 
 env:
   - TOXENV=django19

@@ -3,7 +3,6 @@ psycopg2==2.6.2
 appdirs==1.4.0
 BeautifulSoup==3.2.1
 Django==1.9.6
-django-composer-prk==0.1
 django-crum==0.7.1
 django-nested-admin==3.0.12
 django-ultracache==1.10.1
