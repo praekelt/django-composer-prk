@@ -1,26 +1,18 @@
-import cPickle
-import inspect
-import re
-
 from django.conf import settings
 from django.contrib.contenttypes.fields import GenericForeignKey
 from django.contrib.contenttypes.models import ContentType
-from django.core.cache import cache
 from django.core.urlresolvers import get_script_prefix
 from django.core.validators import MaxValueValidator, MinValueValidator
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
-from .managers import DefaultManager, PermittedManager
 
-from . import SETTINGS as app_settings
+from composer.managers import PermittedManager
 
 
 # TODO: Make sure slot is unique per url and site
 
 class AttributeWrapper:
-    """
-    Wrapper that allows attributes to be added or overridden on an object.
-
+    """Wrapper that allows attributes to be added or overridden on an object.
     Copied from jmbo-foundry.
     """
 
@@ -40,25 +32,23 @@ class AttributeWrapper:
 
     @property
     def klass(self):
-        """
-        Can't override __class__ and making it a property also does not work.
-        Could be because of Django metaclasses.
+        """Can't override __class__ and making it a property also does not
+        work. Could be because of Django metaclasses.
         """
         return self._obj.__class__
 
 
 class Slot(models.Model):
     url = models.CharField(
-        _('URL'),
+        _("URL"),
         max_length=100,
-        default="/",
+        default="^/$",
         db_index=True,
-        help_text=_("Where on the site this slot will appear. Start and end \
-with a slash. Example: '/about-us/people/'"),
+        help_text=_("""Where on the site this slot will appear. This value
+may be a regular expression and may be very complex. A simple example is
+^/about-us/, which means any URL starting with /about-us/ will have this slot."""
+        ),
     )
-    # TODO: Add option to also render on all urls below this one. For now,
-    # that defaults to True.
-    # TODO: Add field with options to pick from a range of urlconf regexes.
     slot_name = models.CharField(
         max_length=32,
         help_text="Which base template slot should this be rendered in?"
@@ -79,7 +69,7 @@ limited to one or two sentences."),
         blank=True,
     )
 
-    objects = DefaultManager()
+    objects = models.Manager()
     permitted = PermittedManager()
 
     def __unicode__(self):
@@ -87,24 +77,19 @@ limited to one or two sentences."),
         return "%s -- %s" % (self.url, self.title)
 
     def get_absolute_url(self):
-        # Taken from flatpages
-        # Handle script prefix manually because we bypass reverse()
-        return iri_to_uri(get_script_prefix().rstrip('/') + self.url)
+        # Taken from flatpages. Handle script prefix manually because we
+        # bypass reverse().
+        return iri_to_uri(get_script_prefix().rstrip("/") + self.url)
 
     @property
     def rows(self):
+        """Fetch rows, columns and tiles in a single query
         """
-        Fetch rows, columns and tiles in a single query
-        """
-
-        key = "composer-slot-rows-%s" % self.id
-        cached = cache.get(key, None)
-        if cached:
-            return cPickle.loads(cached)
 
         # Organize into a structure
-        tiles = Tile.objects.select_related().filter(column__row__slot=self)\
-                .order_by("position")
+        tiles = Tile.objects.select_related().filter(
+            column__row__slot=self
+        ).order_by("position")
         struct = {}
         for tile in tiles:
             row = tile.column.row
@@ -128,21 +113,6 @@ limited to one or two sentences."),
                     column, tiles=struct[row][column]))
             result.append(AttributeWrapper(row, columns=column_objs))
 
-        cache.set(key, cPickle.dumps(result),app_settings["layout_cache_time"])
-
-        return result
-
-    @property
-    def rows_admin(self):
-        return self.row_set.all().order_by("position")
-
-    @property
-    def rows_by_block_name(self):
-        """Return rows grouped by block_name."""
-        result = {}
-        for row in self.rows:
-            result.setdefault(row.block_name, [])
-            result[row.block_name].append(row)
         return result
 
 
@@ -181,9 +151,7 @@ class Row(models.Model):
 
 class Column(models.Model):
     row = models.ForeignKey(Row)
-
     position = models.PositiveIntegerField(default=0)
-
     width = models.PositiveIntegerField(
         default=8,
         validators = [
@@ -191,14 +159,12 @@ class Column(models.Model):
             MinValueValidator(1),
         ]
     )
-
     title = models.CharField(
         max_length=256,
         help_text="The title is rendered at the top of a column.",
         null=True,
         blank=True,
     )
-
     class_name = models.CharField(
         max_length=200,
         help_text="One or more CSS classes that are applied to the column.",
@@ -212,47 +178,41 @@ class Column(models.Model):
 
 
 class Tile(models.Model):
+    """A block tile that renders a view or an object.
     """
-    A block tile that can hold a listing or content item.
-    """
+
     column = models.ForeignKey(Column)
-
     position = models.PositiveIntegerField(default=0)
-
     target_content_type = models.ForeignKey(
         ContentType,
         related_name="tile_target_content_type",
         null=True,
         blank=True,
     )
-
     target_object_id = models.PositiveIntegerField(
         null=True,
         blank=True,
     )
-
     target = GenericForeignKey(
         "target_content_type",
         "target_object_id",
     )
-
     view_name = models.CharField(
         max_length=200,
         help_text="""A view to be rendered in this tile. This view is \
 typically a snippet of a larger page. If you are unsure test and see if \
-it works - you cannot break anything.""",
+it works. If this value is set it has precedence over target.""",
         null=True,
-        blank=True,
+        blank=True
     )
-
     style = models.CharField(
         max_length=200,
-        help_text="Display style. This corresponds to a listing or object \
-style template.",
+        default="tile",
+        help_text="""The style of template that is used to render the item \
+inside the tile if target is set.""",
         null=True,
-        blank=True,
+        blank=True
     )
-
     class_name = models.CharField(
         max_length=200,
         help_text="One or more CSS classes that are applied to the tile.",
@@ -262,4 +222,4 @@ style template.",
 
     @property
     def label(self):
-        return str(self.target or self.view_name)
+        return str(self.view_name or self.target)

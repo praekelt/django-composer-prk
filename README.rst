@@ -11,46 +11,52 @@ Django Composer
 .. contents:: Contents
     :depth: 5
 
+Quick start
+-----------
+
+``django-composer-prk`` is intended to be a standalone library, not a project, but it can indeed be run with::
+
+    - virtualenv ve
+    - ./ve/bin/pip install -r composer/tests/requirements/19.txt
+    - ./ve/bin/python manage.py migrate --run-syncdb --settings=composer.tests.settings.19
+    - ./ve/bin/python manage.py runserver 0.0.0.0:8000 --settings=composer.tests.settings.19
+
+
 Installation
 ------------
 
-#. Install or add ``django-composer-prk`` to your pip requirements.
+#. Install the contents of ``composer/tests/requirements/19.txt`` to your Python environment.
 
-#. Add ``composer`` to your ``INSTALLED_APPS`` setting.
+#. Add ``composer`` to the ``INSTALLED_APPS`` setting.
 
-#. Temporary: Add ``django-nested-admin==3.0.12`` to your pip requirements.
+#. Add ``composer.middleware.ComposerFallbackMiddleware`` to the middleware setting. This will **REPLACE** the flatpages 404 middleware, so remove that if needed.
 
-#. Temporary: Add ``nested_admin`` to your ``INSTALLED_APPS``
+#. Add ``composer.context_processors.slots`` to the context processors setting.
 
-#. Add ``composer.middleware.ComposerFallbackMiddleware`` to your middleware setting. This will **REPLACE** the flatpages 404 middleware, so remove that if needed.
+#. Add the following to your urls.py::
 
-#. Add ``composer.context_processors.slots`` to your context processors setting.
-
-#. Add the following to your urls.py: ::
-
-   url(r"^nested_admin/", include("nested_admin.urls")),
-   url(r"^contentblocks/", include("contentblocks.urls", namespace="contentblocks")),
+   url(r"^nested_admin/", include("nested_admin.urls"))
 
 Content types
 -------------
 
 Slot:
 
-* url: The url where the slot should appear. This follows the same rules as flatpages: start and end with a slash. the url ``/`` has special meaning, which will be detailed in the usage section.
+* url: The URL or URL pattern where the slot should appear. This may be a regular expression.
 
 * slot_name: In your project, the slot names are defined in ``templates/base.html``. This field provides options that are automatically generated from the composer slots found in that base template.
 
 Row:
 
-* Each row is nested within a slot (ordered)
+* Each row is nested within a slot (ordered).
 
-* The row can have extra CSS classes
+* The row can have extra CSS classes.
 
 Column:
 
-* Each column is nested within a row (ordered)
+* Each column is nested within a row (ordered).
 
-* width: A row is 12 columns wide, so columns can be fitted next to each other. 
+* width: A row is 12 columns wide, so columns can be fitted next to each other.
 
 * title: rendered at the top of a column. Can be blank.
 
@@ -58,15 +64,15 @@ Column:
 
 Tile:
 
-* Each tile is nested within a column. (ordered)
+* Each tile is nested within a column (ordered).
 
 * The tile target is a generic foreign key, so it can reference any content type.
 
-* The view name can be any filesystem view. Either a target or view must be specified.
+* The view name can be any filesystem view. Either a target or view must be specified. View name takes precendence if both are set.
 
-* style: The template to use for the listing or object.
+* style: The style is used to look up a suitable template for rendering the target. An example is ``templates/myapp/inclusion_tags/mymodel_tile.html``.
 
-* class_name: The extra classes to add to the tile
+* class_name: The extra CSS classes to add to the tile.
 
 Usage
 -----
@@ -81,14 +87,29 @@ The base template usually defines some composer slots. Typically this would be a
         </div>
     {% endif %}
 
-On any url on the site, if an appropriate slot exists that matches the url and slot name, that slot will be rendered on the page. The current matching logic works as follows:
+On any URL on the site, if an appropriate slot exists that matches the URL and slot name, that slot will be rendered on the page. The current matching logic works as follows:
 
-#. If there is a slot with an url matching the exact current url and a slot name matching the slot on the page, it will be rendered.
-
-#. If there is a slot with the url ``/`` and a slot name matching the slot on the page, it will be rendered. 
+#. Find the slot with the best possible match for the current URL. Slot URL's are treated as regular expressions so one slot can match many URL's.
 
 The content slot is special:
 
-#. Current content overrides the ``content`` slot: Any object that fills the ``content`` block will be rendered in the content block. This includes any modelbase object that will normally be rendered at that url.
+#. If the template being rendered fills the content block then it trumps any slot that may try to fill the content block.
 
-#. A slot with a slot name of ``content`` and an url of ``/`` will serve as the content for the home page of the site. However, it will **NOT** be rendered on any other page, allowing a fallback to flatpages and the normal 404 page.
+Ad-hoc pages
+------------
+
+``django-composer-prk`` offers functionality similar to Django Flatpages. If any request leads to a Page Not Found error then
+the middleware attempts to render up a with name ``content`` and a matching URL. This is particularly useful for creating
+so-called campaign pages.
+
+Target rendering
+----------------
+
+``django-composer-prk`` tries to render in order:
+
+* ``templates/{{ app_label }}/inclusion_tags/{{ model_name }}_{{ tile_style }}.html``
+
+* ``templates/{{ app_label }}/inclusion_tags/{{ tile_style }}.html``
+
+* The view returned by ``target.get_absolute_url()`` if it exists. It will extract HTML within any ``<div id="content">`` tag.
+
