@@ -45,7 +45,7 @@ class Slot(models.Model):
         default="^/$",
         db_index=True,
         help_text=_("""Where on the site this slot will appear. This value
-requires a regular expression and may be very complex. A simple example is
+may be a regular expression and may be very complex. A simple example is
 ^/about-us/, which means any URL starting with /about-us/ will have this slot."""
         ),
     )

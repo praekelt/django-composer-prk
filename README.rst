@@ -72,7 +72,7 @@ Tile:
 
 * style: The style is used to look up a suitable template for rendering the target. An example is ``templates/myapp/inclusion_tags/mymodel_tile.html``.
 
-* class_name: The extra classes to add to the tile.
+* class_name: The extra CSS classes to add to the tile.
 
 Usage
 -----
@@ -95,6 +95,13 @@ The content slot is special:
 
 #. If the template being rendered fills the content block then it trumps any slot that may try to fill the content block.
 
+Ad-hoc pages
+------------
+
+``django-composer-prk`` offers functionality similar to Django Flatpages. If any request leads to a Page Not Found error then
+the middleware attempts to render up a with name ``content`` and a matching URL. This is particularly useful for creating
+so-called campaign pages.
+
 Target rendering
 ----------------
 
@@ -104,5 +111,5 @@ Target rendering
 
 * ``templates/{{ app_label }}/inclusion_tags/{{ tile_style }}.html``
 
-* The view returned by ``get_absolute_url`` if it exists. It will extract HTML within any ``<div id="content">`` tag.
+* The view returned by ``target.get_absolute_url()`` if it exists. It will extract HTML within any ``<div id="content">`` tag.
 
