@@ -146,7 +146,7 @@ class TileNode(template.Node):
                     template_names.extend((
                         "%s/inclusion_tags/%s_%s.html" % \
                             (ct.app_label, ct.model, tile.style or "tile"),
-                        "%s/inclusion_tags/modelbase_%s.html" % \
+                        "%s/inclusion_tags/%s.html" % \
                             (ct.app_label, tile.style or "tile"),
                     ))
                     kls = kls.__bases__[0]
