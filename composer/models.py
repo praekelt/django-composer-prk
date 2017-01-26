@@ -228,7 +228,7 @@ inside the tile if target is set.""",
 
     @property
     def label(self):
-        return str(self.view_name or self.target)
+        return str(self.view_name or self.target or self.markdown[:100])
 
     @cached_property
     def content(self):

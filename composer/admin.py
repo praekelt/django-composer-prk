@@ -13,7 +13,7 @@ class TileInlineForm(forms.ModelForm):
 
     class Meta:
         model = Tile
-        fields = "__all__"
+        exclude = ["markdown"]
 
     def __init__(self, *args, **kwargs):
         super(TileInlineForm, self).__init__(*args, **kwargs)
@@ -88,4 +88,12 @@ class SlotAdmin(nested_admin.NestedModelAdmin):
     form = SlotAdminForm
 
 
+class TileAdmin(admin.ModelAdmin):
+    list_display = ("_label",)
+
+    def _label(self, obj):
+        return obj.label
+
+
 admin.site.register(Slot, SlotAdmin)
+admin.site.register(Tile, TileAdmin)

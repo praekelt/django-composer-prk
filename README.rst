@@ -70,7 +70,7 @@ Tile:
 
 * The view name can be any filesystem view. Either a target or view must be specified. View name takes precendence if both are set.
 
-* Markdown is ad-hoc content.
+* Markdown is ad-hoc content. The admin UI for markdown is currently not optimal and requires a visit to the ``Tiles`` list.
 
 * style: The style is used to look up a suitable template for rendering the target. An example is ``templates/myapp/inclusion_tags/mymodel_tile.html``.
 
