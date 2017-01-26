@@ -1,10 +1,15 @@
+import markdown
+
 from django.conf import settings
 from django.contrib.contenttypes.fields import GenericForeignKey
 from django.contrib.contenttypes.models import ContentType
 from django.core.urlresolvers import get_script_prefix
 from django.core.validators import MaxValueValidator, MinValueValidator
 from django.db import models
+from django.utils.functional import cached_property
 from django.utils.translation import ugettext_lazy as _
+
+from simplemde.fields import SimpleMDEField
 
 from composer.managers import PermittedManager
 
@@ -205,6 +210,7 @@ it works. If this value is set it has precedence over target.""",
         null=True,
         blank=True
     )
+    markdown = SimpleMDEField(null=True, blank=True)
     style = models.CharField(
         max_length=200,
         default="tile",
@@ -223,3 +229,9 @@ inside the tile if target is set.""",
     @property
     def label(self):
         return str(self.view_name or self.target)
+
+    @cached_property
+    def content(self):
+        if not self.markdown:
+            return ""
+        return markdown.markdown(self.markdown)

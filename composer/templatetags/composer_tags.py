@@ -8,6 +8,7 @@ from django.db import models
 from django.http import HttpResponse
 from django.template.loader import render_to_string
 from django.template.response import TemplateResponse
+from django.utils.text import mark_safe
 
 from composer.models import Row
 
@@ -170,5 +171,8 @@ class TileNode(template.Node):
             url = getattr(tile.target, "get_absolute_url", lambda: None)()
             if url:
                 return self._render_url(context, tile, url)
+
+        if tile.content:
+            return mark_safe(tile.content)
 
         return "The tile could not be rendered"

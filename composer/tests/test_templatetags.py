@@ -161,3 +161,39 @@ class TemplateTagsDTestCase(TestCase):
         <div id="footer">
             Footer slot
         </div>""", response.content)
+
+
+class TemplateTagsETestCase(TestCase):
+
+    @classmethod
+    def setUpTestData(cls):
+        super(TemplateTagsETestCase, cls).setUpTestData()
+        cls.slot = Slot.objects.create(slot_name="header", url=HOME_REGEX)
+        cls.slot.sites = Site.objects.all()
+        cls.slot.save()
+        cls.tile = Tile.objects.create(
+            column=Column.objects.create(row=Row.objects.create(slot=cls.slot)),
+            markdown="***I am bold markdown***"
+        )
+        cls.tile.save()
+
+    def test_tile_markdown(self):
+
+        # aaa gets the header slot
+        response = self.client.get(reverse("home"))
+        self.assertHTMLEqual("""
+        <div id="header">
+        	<div class="composer-row None">
+            	<div class="composer-column composer-column-8 None">
+                	<div class="composer-tile None">
+                        <p><strong><em>I am bold markdown</em></strong></p>
+                    </div>
+                </div>
+	        </div>
+        </div>
+        <div id="content">
+            Content slot
+        </div>
+        <div id="footer">
+            Footer slot
+        </div>""", response.content)

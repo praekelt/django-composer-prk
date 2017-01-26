@@ -14,8 +14,10 @@ setup(
     install_requires = [
         "django-crum",
         "django-nested-admin",
+        "django-simplemde",
         "django-ultracache",
-        "BeautifulSoup", # use bs4
+        "BeautifulSoup", # todo: use bs4
+        "markdown",
     ],
     include_package_data=True,
     classifiers=[
