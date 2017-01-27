@@ -1,6 +1,8 @@
 from django.conf import settings
-from django.http import Http404
+from django.http import Http404, HttpResponsePermanentRedirect
+from django.shortcuts import get_object_or_404
 
+from composer.models import Slot
 from composer.views import SlotView
 
 
@@ -20,9 +22,27 @@ class ComposerFallbackMiddleware(object):
         try:
             return SlotView.as_view()(request)
         except Http404:
-            # Pass through to the flatpage fallback
-            if "flatpages" not in settings.INSTALLED_APPS:
-                return response
+            # Try the url with a slash appended.
+            url = request.path_info
+            if not url.endswith("/") and settings.APPEND_SLASH:
+                url += "/"
+                try:
+                    f = get_object_or_404(
+                        Slot.permitted,
+                        url=url,
+                        slot_name="content"
+                    )
+                    return HttpResponsePermanentRedirect("%s/" % request.path)
+                except Http404:
+                    # No slot with slash appended. Fall through.
+                    pass
+            else:
+                # Settings say do not append a slash.
+                pass
+
+        # Both "pass" conditions above means we did not find a suitable slot.
+        if "flatpages" not in settings.INSTALLED_APPS:
+            return response
 
         try:
             return flatpage(request, request.path_info)
