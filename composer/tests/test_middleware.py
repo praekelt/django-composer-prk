@@ -38,3 +38,18 @@ class MiddleWareTestCase(TestCase):
         <div id="footer">
             Footer slot
         </div>""", response.content)
+
+    def test_404_no_slash(self):
+        response = self.client.get("/four-o-four")
+        self.assertRedirects(
+            response,
+            "/four-o-four/",
+            status_code=301,
+            target_status_code=200,
+            fetch_redirect_response=True
+        )
+
+    def test_404_no_slash_no_redirect(self):
+        with self.settings(APPEND_SLASH=False):
+            response = self.client.get("/four-o-four")
+            self.assertEqual(response.status_code, 404)
