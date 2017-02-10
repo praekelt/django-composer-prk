@@ -86,14 +86,33 @@ class SlotAdminForm(forms.ModelForm):
 class SlotAdmin(nested_admin.NestedModelAdmin):
     inlines = [RowInline]
     form = SlotAdminForm
+    search_fields = [
+        "title", "url"
+    ]
+    list_filter = [
+        "slot_name"
+    ]
+    ordering = ["url"]
 
 
 class TileAdmin(admin.ModelAdmin):
-    list_display = ("_label",)
+    list_display = ("_label", "_slot", "_slot_url")
+    search_fields = [
+        "column__row__slot__url", "column__row__slot__title"
+    ]
+    list_filter = [
+        "column__row__slot__slot_name"
+    ]
+    ordering = ["column__row__slot__url"]
 
     def _label(self, obj):
         return obj.label
 
+    def _slot(self, obj):
+        return obj.column.row.slot.title
+
+    def _slot_url(self, obj):
+        return obj.column.row.slot.url
 
 admin.site.register(Slot, SlotAdmin)
 admin.site.register(Tile, TileAdmin)
