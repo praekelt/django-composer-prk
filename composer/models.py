@@ -228,7 +228,12 @@ inside the tile if target is set.""",
 
     @property
     def label(self):
-        return str(self.view_name or self.target or self.markdown[:100])
+        # Dangling targets pose a problem
+        try:
+            target = self.target
+        except AttributeError:
+            target = "Target has been deleted"
+        return str(self.view_name or target or self.markdown[:100])
 
     @cached_property
     def content(self):
