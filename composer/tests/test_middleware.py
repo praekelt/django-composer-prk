@@ -29,7 +29,7 @@ class MiddleWareTestCase(TestCase):
         <div id="content">
             <div class="composer-row None">
                 <div class="composer-column composer-column-8 None">
-                    <div class="composer-tile None">
+                    <div class="composer-tile None" data-oid="%s">
                         I am the header
                     </div>
                 </div>
@@ -37,7 +37,7 @@ class MiddleWareTestCase(TestCase):
         </div>
         <div id="footer">
             Footer slot
-        </div>""", response.content)
+        </div>""" % self.tile.id, response.content)
 
     def test_404_no_slash(self):
         response = self.client.get("/four-o-four")

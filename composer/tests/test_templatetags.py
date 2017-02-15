@@ -59,7 +59,7 @@ class TemplateTagsBTestCase(TestCase):
         <div id="content">
             <div class="composer-row None">
                 <div class="composer-column composer-column-8 None">
-                    <div class="composer-tile None">
+                    <div class="composer-tile None" data-oid="%s">
                         I am DummyModel1 One
                     </div>
                 </div>
@@ -67,7 +67,7 @@ class TemplateTagsBTestCase(TestCase):
         </div>
         <div id="footer">
             Footer slot
-        </div>""", response.content)
+        </div>""" % self.tile.id, response.content)
 
 
 class TemplateTagsCTestCase(TestCase):
@@ -97,7 +97,7 @@ class TemplateTagsCTestCase(TestCase):
         <div id="content">
             <div class="composer-row None">
                 <div class="composer-column composer-column-8 None">
-                    <div class="composer-tile None">
+                    <div class="composer-tile None" data-oid="%s">
                         I am a tile for DummyModel2 One
                     </div>
                 </div>
@@ -105,7 +105,7 @@ class TemplateTagsCTestCase(TestCase):
         </div>
         <div id="footer">
             Footer slot
-        </div>""", response.content)
+        </div>""" % self.tile.id, response.content)
 
 
 class TemplateTagsDTestCase(TestCase):
@@ -130,7 +130,7 @@ class TemplateTagsDTestCase(TestCase):
         <div id="header">
         	<div class="composer-row None">
             	<div class="composer-column composer-column-8 None">
-                	<div class="composer-tile None">
+                	<div class="composer-tile None" data-oid="%s">
                     	I am the header
                     </div>
                 </div>
@@ -141,7 +141,7 @@ class TemplateTagsDTestCase(TestCase):
         </div>
         <div id="footer">
             Footer slot
-        </div>""", response.content)
+        </div>""" % self.tile.id, response.content)
 
 		# bbb also gets the header slot because the regex does not end with a dollar
         response = self.client.get(reverse("bbb"))
@@ -149,7 +149,7 @@ class TemplateTagsDTestCase(TestCase):
         <div id="header">
         	<div class="composer-row None">
             	<div class="composer-column composer-column-8 None">
-                	<div class="composer-tile None">
+                	<div class="composer-tile None" data-oid="%s">
                     	I am the header
                     </div>
                 </div>
@@ -160,7 +160,7 @@ class TemplateTagsDTestCase(TestCase):
         </div>
         <div id="footer">
             Footer slot
-        </div>""", response.content)
+        </div>""" % self.tile.id, response.content)
 
 
 class TemplateTagsETestCase(TestCase):
@@ -185,7 +185,7 @@ class TemplateTagsETestCase(TestCase):
         <div id="header">
         	<div class="composer-row None">
             	<div class="composer-column composer-column-8 None">
-                	<div class="composer-tile None">
+                	<div class="composer-tile None" data-oid="%s">
                         <p><strong><em>I am bold markdown</em></strong></p>
                     </div>
                 </div>
@@ -196,4 +196,4 @@ class TemplateTagsETestCase(TestCase):
         </div>
         <div id="footer">
             Footer slot
-        </div>""", response.content)
+        </div>""" % self.tile.id, response.content)
