@@ -47,14 +47,13 @@ class ComposerNode(template.Node):
         if self.slot_name not in context["composer_slots"]:
             return ""
 
-        slot_id = context["composer_slots"][self.slot_name].id
-
-        rows = Row.objects.filter(slot__id=slot_id).order_by("position")
+        slot = context["composer_slots"][self.slot_name]
+        rows = slot.rows
         if rows:
             # We have customized rows for the block. Use them.
             return render_to_string(
                 "composer/inclusion_tags/composer.html",
-                context={"rows":rows},
+                context={"rows": rows},
                 request=request
             )
 
@@ -138,8 +137,7 @@ class TileNode(template.Node):
                 return "No reverse match for %s" % tile.view_name
             return self._render_url(context, tile, url)
 
-        if tile.target:
-
+        if tile.target_object_id:
             with context.push():
                 obj = tile.target
                 context["object"] = obj
