@@ -92,9 +92,53 @@ limited to one or two sentences."),
         """
 
         # Organize into a structure
-        tiles = Tile.objects.select_related().filter(
+        tiles = []
+        for tile in Tile.objects.select_related("column__row").filter(
             column__row__slot=self
-        ).order_by("position")
+        ).order_by("position"):
+            tiles.append(AttributeWrapper(tile, target=None))
+
+        # The most difficult part is to fetch the generic foreign keys in the
+        # least amount of queries.
+
+        # Key is content type id, value is target id
+        map_ct_targets = {}
+
+        # Key one is content type id, key two is target id, value is a list of
+        # tiles.
+        map_two_deep = {}
+
+        # Populate the dictionaries
+        for tile in tiles:
+            ct_id = tile.target_content_type_id
+            if not ct_id:
+                continue
+            target_id = tile.target_object_id
+
+            # map_ct_targets
+            if ct_id not in map_ct_targets:
+                map_ct_targets[ct_id] = []
+            map_ct_targets[ct_id].append(target_id)
+
+            # map_two_deep
+            if ct_id not in map_two_deep:
+                map_two_deep[ct_id] = {}
+            if target_id not in map_two_deep[ct_id]:
+                map_two_deep[ct_id][target_id] = []
+            map_two_deep[ct_id][target_id].append(tile)
+
+        # Pre-lookup the content types
+        content_types = {}
+        for ct in ContentType.objects.filter(id__in=map_ct_targets.keys()):
+            content_types[ct.id] = ct
+
+        # Set the target objects on the tiles
+        for ct_id, ids in map_ct_targets.items():
+            for obj in content_types[ct_id].model_class().objects.filter(id__in=ids):
+                for tile in map_two_deep[ct_id][obj.id]:
+                    tile._attributes["target"] = obj
+
+        # Build the structure
         struct = {}
         for tile in tiles:
             row = tile.column.row
@@ -134,9 +178,10 @@ class Row(models.Model):
     @property
     def columns(self):
         """Fetch columns and tiles in a single query"""
+
         # Organize into a structure
         struct = {}
-        tiles = Tile.objects.select_related().filter(
+        tiles = Tile.objects.select_related("column").filter(
                 column__row=self).order_by("position")
         for tile in tiles:
             column = tile.column
