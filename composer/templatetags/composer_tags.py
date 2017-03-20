@@ -85,6 +85,12 @@ class TileNode(template.Node):
         """Helper method that safely renders a view looked up from a URL."""
 
         request = context["request"]
+
+        # Resolve view name to a function or object xxx: this is slow
+        # because there is no way to get the view function / object
+        # directly from the view name - you have to pass through the url.
+        # But since the result is consistent while the Django process is
+        # running it is a good candidate for caching.
         view, args, kwargs = resolve(url)
 
         # Construct a final kwargs that includes the context
@@ -107,7 +113,7 @@ class TileNode(template.Node):
             # Old-school view
             html = result.content
 
-        # Clear flags
+        # Clear flag
         delattr(request, "_composer_suppress_rows_tag")
 
         # Extract content div if any. This is typically needed for views
@@ -126,24 +132,29 @@ class TileNode(template.Node):
         request = context["request"]
 
         if tile.view_name:
-            # Resolve view name to a function or object xxx: this is slow
-            # because there is no way to get the view function / object
-            # directly from the view name - you have to pass through the url.
-            # But since the result is consistent while the Django process is
-            # running it is a good candidate for caching.
             try:
                 url = reverse(tile.view_name)
             except NoReverseMatch:
                 return "No reverse match for %s" % tile.view_name
-            return self._render_url(context, tile, url)
+            content = self._render_url(context, tile, url)
+            with context.push():
+                context["object"] = None
+                context["content"] = content
+                try:
+                    return render_to_string(
+                        "composer/inclusion_tags/%s.html" % tile.style or "tile",
+                        context.flatten()
+                    )
+                except template.TemplateDoesNotExist:
+                    return content
 
         if tile.target_object_id:
             with context.push():
                 obj = tile.target
                 context["object"] = obj
 
-                # Template names follow typical Django naming convention, but also
-                # traverse upwards over inheritance hierarchy.
+                # Template names follow typical Django naming convention, but
+                # also traverse upwards over inheritance hierarchy.
                 template_names = []
                 ct = ContentType.objects.get_for_model(obj._meta.model)
                 kls = obj._meta.model
@@ -171,6 +182,16 @@ class TileNode(template.Node):
                 return self._render_url(context, tile, url)
 
         if tile.content:
-            return mark_safe(tile.content)
+            content = mark_safe(tile.content)
+            with context.push():
+                context["object"] = None
+                context["content"] = content
+                try:
+                    return render_to_string(
+                        "composer/inclusion_tags/%s.html" % tile.style or "tile",
+                        context.flatten()
+                    )
+                except template.TemplateDoesNotExist:
+                    return content
 
-        return "The tile could not be rendered"
+        return "The tile id=%s could not be rendered" % tile.id
