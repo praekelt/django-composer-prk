@@ -182,10 +182,9 @@ class TileNode(template.Node):
                 return self._render_url(context, tile, url)
 
         if tile.content:
-            content = mark_safe(tile.content)
             with context.push():
                 context["object"] = None
-                context["content"] = content
+                context["content"] = tile.content
                 try:
                     return render_to_string(
                         "composer/inclusion_tags/%s.html" % tile.style or "tile",

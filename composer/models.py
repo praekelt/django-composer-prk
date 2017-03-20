@@ -7,6 +7,7 @@ from django.core.urlresolvers import get_script_prefix
 from django.core.validators import MaxValueValidator, MinValueValidator
 from django.db import models
 from django.utils.functional import cached_property
+from django.utils.text import mark_safe
 from django.utils.translation import ugettext_lazy as _
 
 from simplemde.fields import SimpleMDEField
@@ -284,4 +285,4 @@ inside the tile if target is set.""",
     def content(self):
         if not self.markdown:
             return ""
-        return markdown.markdown(self.markdown)
+        return mark_safe(markdown.markdown(self.markdown))
