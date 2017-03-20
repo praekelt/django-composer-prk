@@ -68,7 +68,7 @@ Tile:
 
 * The tile target is a generic foreign key, so it can reference any content type.
 
-* The view name can be any filesystem view. Either a target or view must be specified. View name takes precendence if both are set.
+* The view name can be any Django named view.
 
 * Markdown is ad-hoc content. The admin UI for markdown is currently not optimal and requires a visit to the ``Tiles`` list.
 
@@ -104,14 +104,41 @@ Ad-hoc pages
 the middleware attempts to render up a with name ``content`` and a matching URL. This is particularly useful for creating
 so-called campaign pages.
 
-Target rendering
+Tile rendering
 ----------------
 
-``django-composer-prk`` tries to render in order:
+Composer tries to render in order: view name, target, markdown.
+
+View name
+*********
+
+Renders the view and attempts to extract anything in ``<div id="content">``. The
+result is then printed by ``templates/composer/tile.html``. Variables ``tile``
+and ``content`` are available in the template context.
+
+Target
+******
+
+Traverses upwards through an inheritance hierarchy until the best matched
+template is found.  Variables ``tile``, ``object`` (the target) and ``content``
+are available in the template context.
+
+Naming convention:
 
 * ``templates/{{ app_label }}/inclusion_tags/{{ model_name }}_{{ tile_style }}.html``
 
 * ``templates/{{ app_label }}/inclusion_tags/{{ tile_style }}.html``
 
-* The view returned by ``target.get_absolute_url()`` if it exists. It will extract HTML within any ``<div id="content">`` tag.
+If no template is found then renders the view returned by
+``target.get_absolute_url()`` if it exists. It attempts to extract anything in
+``<div id="content">``. The result is then printed by
+``templates/composer/tile.html``. Variables ``tile`` and ``content`` are
+available in the template context.
+
+Markdown
+********
+
+The markdown is converted to HTML and then printed by
+``templates/composer/tile.html``. Variables ``tile`` and ``content`` are
+available in the template context.
 

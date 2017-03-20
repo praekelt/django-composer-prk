@@ -176,10 +176,19 @@ class TileNode(template.Node):
                     except template.TemplateDoesNotExist:
                         pass
 
-            # We couldn't find a suitable template. Attempt get_absolute_url.
-            url = getattr(tile.target, "get_absolute_url", lambda: None)()
-            if url:
-                return self._render_url(context, tile, url)
+                # We couldn't find a suitable template. Attempt get_absolute_url.
+                url = getattr(tile.target, "get_absolute_url", lambda: None)()
+                if url:
+                    content = self._render_url(context, tile, url)
+                    context["object"] = None
+                    context["content"] = content
+                    try:
+                        return render_to_string(
+                            "composer/inclusion_tags/%s.html" % tile.style or "tile",
+                            context.flatten()
+                        )
+                    except template.TemplateDoesNotExist:
+                        return content
 
         if tile.content:
             with context.push():
