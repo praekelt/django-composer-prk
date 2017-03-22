@@ -148,7 +148,7 @@ class TileNode(template.Node):
                 except template.TemplateDoesNotExist:
                     return content
 
-        if tile.target_object_id:
+        if tile.target:
             with context.push():
                 obj = tile.target
                 context["object"] = obj
