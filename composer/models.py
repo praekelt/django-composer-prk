@@ -279,7 +279,7 @@ inside the tile if target is set.""",
             target = self.target
         except AttributeError:
             target = "Target has been deleted"
-        return str(self.view_name or target or self.markdown[:100])
+        return unicode(self.view_name or target or self.markdown[:100])
 
     @cached_property
     def content(self):
