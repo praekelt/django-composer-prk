@@ -200,6 +200,6 @@ class TileNode(template.Node):
                         context.flatten()
                     )
                 except template.TemplateDoesNotExist:
-                    return content
+                    return tile.content
 
         return "The tile id=%s could not be rendered" % tile.id
