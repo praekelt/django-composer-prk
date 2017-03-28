@@ -1,4 +1,5 @@
 from django import forms
+from django.conf import settings
 from django.contrib import admin
 from django.template import loader
 
@@ -17,9 +18,18 @@ class TileInlineForm(forms.ModelForm):
 
     def __init__(self, *args, **kwargs):
         super(TileInlineForm, self).__init__(*args, **kwargs)
-        self.fields['view_name'].widget = forms.widgets.Select(
+
+        self.fields["view_name"].widget = forms.widgets.Select(
             choices=[("", "")] + get_view_choices()
         )
+
+        try:
+            styles = list(settings.COMPOSER["styles"])
+        except (AttributeError, KeyError):
+            styles = []
+        styles.append(("tile", "Tile"))
+        styles.sort()
+        self.fields["style"].widget = forms.widgets.Select(choices=styles)
 
 
 class TileInline(nested_admin.NestedTabularInline):

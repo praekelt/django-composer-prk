@@ -79,7 +79,10 @@ Tile:
 Usage
 -----
 
-The base template usually defines some composer slots. Typically this would be a header slot, content slot and footer slot. This can be extended easily by adding slots to the ``templates/base.html`` template. Example of adding a sidebar slot: ::
+The base template usually defines some composer slots. Typically this would be
+a header slot, content slot and footer slot. This can be extended easily by
+adding slots to the ``templates/base.html`` template. Example of adding a
+sidebar slot: ::
 
     {% if composer_slots %}{% load composer_tags %}{% endif %}
 
@@ -96,6 +99,15 @@ On any URL on the site, if an appropriate slot exists that matches the URL and s
 The content slot is special:
 
 #. If the template being rendered fills the content block then it trumps any slot that may try to fill the content block.
+
+Settings
+--------
+
+You need to define the types of tiles available to the system in settings. The
+``tile`` style is added implicitly. See the tile rendering section on how to
+create the corresponding templates: ::
+
+    COMPOSER = {"styles": (("block", "Block"), ("tiny": "Tiny"))}
 
 Ad-hoc pages
 ------------
