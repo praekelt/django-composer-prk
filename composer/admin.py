@@ -1,4 +1,5 @@
 from django import forms
+from django.conf import settings
 from django.contrib import admin
 from django.template import loader
 
@@ -13,13 +14,22 @@ class TileInlineForm(forms.ModelForm):
 
     class Meta:
         model = Tile
-        exclude = ["markdown"]
+        fields = "__all__"
 
     def __init__(self, *args, **kwargs):
         super(TileInlineForm, self).__init__(*args, **kwargs)
-        self.fields['view_name'].widget = forms.widgets.Select(
+
+        self.fields["view_name"].widget = forms.widgets.Select(
             choices=[("", "")] + get_view_choices()
         )
+
+        try:
+            styles = list(settings.COMPOSER["styles"])
+        except (AttributeError, KeyError):
+            styles = []
+        styles.append(("tile", "Tile"))
+        styles.sort()
+        self.fields["style"].widget = forms.widgets.Select(choices=styles)
 
 
 class TileInline(nested_admin.NestedTabularInline):
@@ -72,7 +82,7 @@ class SlotAdminForm(forms.ModelForm):
             choices=slot_name_choices
         )
 
-        # Find a sensible initial value. Prefer "content".  If instance is in
+        # Find a sensible initial value. Prefer "content". If instance is in
         # kwargs, we already have a choice, so ignore.
         if "instance" not in kwargs and slot_name_choices:
             initial = slot_name_choices[0][0]
@@ -113,6 +123,7 @@ class TileAdmin(admin.ModelAdmin):
 
     def _slot_url(self, obj):
         return obj.column.row.slot.url
+
 
 admin.site.register(Slot, SlotAdmin)
 admin.site.register(Tile, TileAdmin)

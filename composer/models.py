@@ -234,6 +234,14 @@ class Tile(models.Model):
 
     column = models.ForeignKey(Column)
     position = models.PositiveIntegerField(default=0)
+    view_name = models.CharField(
+        max_length=200,
+        help_text="""A view to be rendered in this tile. This view is \
+typically a snippet of a larger page. If you are unsure test and see if \
+it works. If this value is set it has precedence over target.""",
+        null=True,
+        blank=True
+    )
     target_content_type = models.ForeignKey(
         ContentType,
         related_name="tile_target_content_type",
@@ -247,14 +255,6 @@ class Tile(models.Model):
     target = GenericForeignKey(
         "target_content_type",
         "target_object_id",
-    )
-    view_name = models.CharField(
-        max_length=200,
-        help_text="""A view to be rendered in this tile. This view is \
-typically a snippet of a larger page. If you are unsure test and see if \
-it works. If this value is set it has precedence over target.""",
-        null=True,
-        blank=True
     )
     markdown = SimpleMDEField(null=True, blank=True)
     style = models.CharField(
