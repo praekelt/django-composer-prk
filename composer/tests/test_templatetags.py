@@ -197,3 +197,32 @@ class TemplateTagsETestCase(TestCase):
         <div id="footer">
             Footer slot
         </div>""" % self.tile.id, response.content)
+
+
+class TemplateTagsContextTestCase(TestCase):
+
+    @classmethod
+    def setUpTestData(cls):
+        super(TemplateTagsContextTestCase, cls).setUpTestData()
+        cls.slot = Slot.objects.create(
+            slot_name="default_slot_context",
+            url="^" + reverse("slot_context"),
+            title="test_title_for_base_slot"
+        )
+        cls.slot.sites = Site.objects.all()
+        cls.slot.save()
+
+    def test_default_slot(self):
+        # Home renders the custom composer/inclusion_tags/content.html
+        response = self.client.get(reverse("slot_context"))
+        self.assertEqual(response.context["object"], self.slot)
+        self.assertHTMLEqual("""
+        <div id="header">
+            Header slot
+        </div>
+        <div id="content">
+            Has a slot that passes default context. This is the default slot context title: test_title_for_base_slot
+        </div>
+        <div id="footer">
+            Footer slot
+        </div>""", response.content)
