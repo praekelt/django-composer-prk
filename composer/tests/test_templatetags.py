@@ -213,7 +213,9 @@ class TemplateTagsContextTestCase(TestCase):
         cls.slot.save()
 
     def test_default_slot(self):
-        # Home renders the custom composer/inclusion_tags/content.html
+        # slot_context renders the custom
+        # composer/inclusion_tags/default_slot_context.html within
+        # tests/slot_context.html.
         response = self.client.get(reverse("slot_context"))
         self.assertEqual(response.context["object"], self.slot)
         self.assertHTMLEqual("""
