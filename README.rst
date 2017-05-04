@@ -109,6 +109,13 @@ create the corresponding templates: ::
 
     COMPOSER = {"styles": (("block", "Block"), ("tiny": "Tiny"))}
 
+If you would like the styles to be inferred from all the installed apps add: ::
+
+    COMPOSER = {"load_existing_styles": True}
+
+It can be used in tandem with the ``styles`` setting.
+Will add all styles that are already tied to apps and models that follow the correct naming convention.
+
 Ad-hoc pages
 ------------
 
