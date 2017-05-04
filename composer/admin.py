@@ -27,23 +27,57 @@ class TileInlineForm(forms.ModelForm):
         self.fields["view_name"].widget = forms.widgets.Select(
             choices=[("", "")] + get_view_choices()
         )
+
         try:
             styles = list(settings.COMPOSER["styles"])
         except (AttributeError, KeyError):
             styles = []
-
         styles.append(("tile", "Tile"))
-        if settings.COMPOSER.get("load_existing_styles", False) is True:
+
+        if settings.COMPOSER.get("load_existing_styles"):
             styles = styles + self.get_existing_styles()
+
         styles.sort()
         self.fields["style"].widget = forms.widgets.Select(choices=styles)
 
     def get_existing_styles(self):
         # Get a list of all the availible templates in the project.
         template_dirs = app_directories.get_app_template_dirs("templates")
+        styles_settings = settings.COMPOSER["load_existing_styles"]
+        greedy = styles_settings.get("greedy", False)
+        excludes = styles_settings.get("excludes")
+        includes = styles_settings.get("includes")
+
+        # If for some reason none of the actual values are supplied return an
+        # empty list.
+        if not greedy and excludes == None and includes == None:
+            return []
+
+        # Do an early exclude when entire apps need to be excluded, means less
+        # directories to actually check on the file system itself. Excluding
+        # takes priority over including, we don't enforce using only one or the
+        # other. Ignore both if greedy is True.
+        if styles_settings.get("greedy", False) is not True:
+            to_exclude = []
+            if excludes:
+                for app, models in excludes.items():
+                    if models == "__all__":
+                        for app_templates in template_dirs:
+                            if "%s/templates" % app in app_templates:
+                                to_exclude.append(app_templates)
+                template_dirs = set(template_dirs) - set(to_exclude)
+
+            to_include = []
+            if includes:
+                for app, models in includes.items():
+                    if models== "__all__":
+                        for app_templates in template_dirs:
+                            if "%s/templates" % app in app_templates:
+                                to_include.append(app_templates)
+                template_dirs = set(template_dirs) - (set(template_dirs) - set(to_include))
 
         template_dict = {}
-        # Traverse all the directories within the tempalte directories of all
+        # Traverse all the directories within the template directories of all
         # availible apps.
         for app_templates in template_dirs:
             for path, dirnames, filenames in os.walk(app_templates):
