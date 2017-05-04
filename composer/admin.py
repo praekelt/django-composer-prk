@@ -1,7 +1,12 @@
+import os
+import re
+
 from django import forms
+from django.apps import apps
 from django.conf import settings
 from django.contrib import admin
 from django.template import loader
+from django.template.loaders import app_directories
 
 import nested_admin
 
@@ -22,14 +27,42 @@ class TileInlineForm(forms.ModelForm):
         self.fields["view_name"].widget = forms.widgets.Select(
             choices=[("", "")] + get_view_choices()
         )
-
         try:
             styles = list(settings.COMPOSER["styles"])
         except (AttributeError, KeyError):
             styles = []
+
         styles.append(("tile", "Tile"))
+        if settings.COMPOSER.get("load_existing_styles", False) is True:
+            styles = styles + self.get_existing_styles()
         styles.sort()
         self.fields["style"].widget = forms.widgets.Select(choices=styles)
+
+    def get_existing_styles(self):
+        template_dirs = app_directories.get_app_template_dirs("templates")
+        template_dict = {}
+        for app_templates in template_dirs:
+            for path, dirnames, filenames in os.walk(app_templates):
+                if filenames and "inclusion_tags" in path:
+                    for filename in filenames:
+                        if len(filename.replace(".html", "").split("_")) > 1:
+                            template_dict[filename.split("_")[0]] = { "path": os.path.join(path, filename), "filename": filename }
+                            test_list = template_dict.keys()
+
+        styles_dict = {}
+        for model in apps.get_models():
+            model_name = model._meta.model_name
+            app_label = model._meta.app_label
+            template_data = template_dict.get(model_name)
+            if template_data:
+                filename = template_data["filename"]
+                path = template_data["path"]
+                if "%s/inclusion_tags/%s_" % (app_label, model_name) in path:
+                    pattern = re.compile(("%s_|.html" % (model_name)))
+                    style = pattern.sub("", filename)
+                    if style not in styles_dict.keys():
+                        styles_dict[style] = style.capitalize().replace("_", " ")
+        return [(k, v) for k, v in styles_dict.iteritems()]
 
 
 class TileInline(nested_admin.NestedTabularInline):
