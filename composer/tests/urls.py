@@ -30,4 +30,9 @@ urlpatterns = [
         TemplateView.as_view(template_name="tests/bbb.html"),
         name="bbb"
     ),
+    url(
+        r"^slot-context/$",
+        TemplateView.as_view(template_name="tests/slot_context.html"),
+        name="slot_context"
+    ),
 ]

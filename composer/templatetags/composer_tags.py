@@ -60,7 +60,7 @@ class ComposerNode(template.Node):
         # Default rendering
         return render_to_string(
             "composer/inclusion_tags/%s.html" % self.slot_name,
-            context={},
+            context={"object": slot},
             request=request
         )
 

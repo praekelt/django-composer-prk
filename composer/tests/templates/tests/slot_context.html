@@ -1,0 +1,12 @@
+{% extends "base.html" %}
+
+{% if composer_slots %}
+    {% load composer_tags %}
+{% endif %}
+
+{% block content %}
+    Has a slot that passes default context.
+    {% if composer_slots.default_slot_context %}
+        {% composer default_slot_context %}
+    {% endif %}
+{% endblock %}
