@@ -34,8 +34,14 @@ class TileInlineForm(forms.ModelForm):
             styles = []
         styles.append(("tile", "Tile"))
 
-        if settings.COMPOSER.get("load_existing_styles"):
-            styles = styles + self.get_existing_styles()
+        try:
+            if settings.COMPOSER.get("load_existing_styles"):
+                # TODO Handle duplciates
+                styles = styles + self.get_existing_styles()
+        except (AttributeError):
+            # If the attribute is missing, we don't need to do anything
+            # further.
+            pass
 
         styles.sort()
         self.fields["style"].widget = forms.widgets.Select(choices=styles)
