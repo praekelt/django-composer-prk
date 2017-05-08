@@ -42,7 +42,6 @@ class TileInlineForm(forms.ModelForm):
 
     def get_existing_styles(self):
         # Get a list of all the availible templates in the project.
-        template_dirs = app_directories.get_app_template_dirs("templates")
         styles_settings = settings.COMPOSER["load_existing_styles"]
         greedy = styles_settings.get("greedy", False)
         excludes = styles_settings.get("excludes")
@@ -53,51 +52,38 @@ class TileInlineForm(forms.ModelForm):
         if not greedy and excludes == None and includes == None:
             return []
 
-        # Do an early exclude when entire apps need to be excluded, means less
-        # directories to actually check on the file system itself. Excluding
-        # takes priority over including, we don't enforce using only one or the
-        # other. Ignore both if greedy is True.
-        if styles_settings.get("greedy", False) is not True:
-            to_exclude = []
-            if excludes:
-                for app, models in excludes.items():
-                    if models == "__all__":
-                        for app_templates in template_dirs:
-                            if "%s/templates" % app in app_templates:
-                                to_exclude.append(app_templates)
-                template_dirs = set(template_dirs) - set(to_exclude)
-
-            to_include = []
-            if includes:
-                for app, models in includes.items():
-                    if models== "__all__":
-                        for app_templates in template_dirs:
-                            if "%s/templates" % app in app_templates:
-                                to_include.append(app_templates)
-                template_dirs = set(template_dirs) - (set(template_dirs) - set(to_include))
+        # Get the app template directories and installed apps.
+        template_dirs = app_directories.get_app_template_dirs("templates")
+        installed_apps = apps.app_configs.keys()
 
         template_dict = {}
         # Traverse all the directories within the template directories of all
         # availible apps.
-        for app_templates in template_dirs:
-            for path, dirnames, filenames in os.walk(app_templates):
+        for app_dir in template_dirs:
+            for path, dirnames, filenames in os.walk(app_dir):
 
                 # Composer template tags expect the templates to live within
                 # the app inclusion tags, so a good area to start ignoring any
                 # templates that won't match.
                 if filenames and "inclusion_tags" in path:
+                    split = path.split("/")
+
+                    # To ensure inclusion_tags is the current directory we are
+                    # in.
+                    if not split[len(split)-1] == "inclusion_tags":
+                        continue
+
+                    # We already made sure inclusion_tags is in the path, so
+                    # safe assumption is app_label should prefix it. In the
+                    # event this is not a valid app name, these files will
+                    # merely get ignored.
+                    app_label = split[len(split)-2]
                     for filename in filenames:
 
                         # The naming convention that the composer tags expect
-                        # is modelnam_style.html. If the template name has no
+                        # is modelname_style.html. If the template name has no
                         # underscores it won't ever be valid.
                         if len(filename.split("_")) > 1:
-
-                            # Grab the first part of the template name as the
-                            # key, useful to easily ignore templates that
-                            # contain underscores but not the modelname at the
-                            # start. We check against actual model names later.
-                            key = filename.split("_")[0]
                             data = {
                                 "path": os.path.join(path, filename),
                                 "filename": filename
@@ -106,16 +92,29 @@ class TileInlineForm(forms.ModelForm):
                             # There will more than likely be multiple templates
                             # with the same base key, so we add them to a list
                             # for iteration later on.
-                            if template_dict.get(key, None) is None:
-                                template_dict[key] = []
-                            template_dict[key].append(data)
+                            if template_dict.get(app_label, None) is None:
+                                template_dict[app_label] = []
+                            template_dict[app_label].append(data)
 
+        # We compare against the actual installed apps and their models to try
+        # and get rid of false positives.
         styles_dict = {}
         for model in apps.get_models():
             model_name = model._meta.model_name
             app_label = model._meta.app_label
-            template_data = template_dict.get(model_name)
-            if template_data:
+            template_data = template_dict.get(app_label, None)
+            if template_data is not None:
+
+                if not greedy:
+                    if excludes:
+                        to_exclude = excludes.get(app_label, [])
+                        if to_exclude == "__all__" or model_name in to_exclude:
+                            continue
+                    if includes:
+                        to_include = includes.get(app_label, [])
+                        if to_include != "__all__" and model_name not in to_include:
+                            continue
+
                 for template in template_data:
                     filename = template["filename"]
                     path = template["path"]
