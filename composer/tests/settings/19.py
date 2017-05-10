@@ -14,6 +14,7 @@ DATABASES = {
 
 INSTALLED_APPS = (
     "composer.tests",
+    "composer.tests.additionals",
     "composer",
     "django.contrib.admin",
     "django.contrib.auth",

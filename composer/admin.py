@@ -36,8 +36,11 @@ class TileInlineForm(forms.ModelForm):
 
         try:
             if settings.COMPOSER.get("load_existing_styles"):
-                # TODO Handle duplciates
-                styles = styles + self.get_existing_styles()
+
+                # Make use of the build in set to remove exact duplicates then
+                # parse back into a list of tuples.
+                styles = set(styles + self.get_existing_styles())
+                styles = list(styles)
         except (AttributeError):
             # If the attribute is missing, we don't need to do anything
             # further.
