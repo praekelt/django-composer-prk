@@ -76,6 +76,7 @@ class TestTileAdminForm(TestCase):
         "load_existing_styles":
         {"greedy": True},
         "styles": [
+            ("detail", "Detail"),
             ("context", "Context"),
             ("extra_style", "Extra style"),
             ("style_for_model_one", "Style for model one"),
@@ -86,6 +87,7 @@ class TestTileAdminForm(TestCase):
         expected_choices = [
             ("3rdparty_override", "3rdparty override"),
             ("context", "Context"),
+            ("detail", "Detail"),
             ("extra_style", "Extra style"),
             ("style_for_model_one", "Style for model one"),
             ("tile", "Tile")
