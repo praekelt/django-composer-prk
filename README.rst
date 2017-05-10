@@ -113,7 +113,7 @@ If you would like the styles to be inferred from all the installed apps add: ::
 
     COMPOSER = {"load_existing_styles": {"greedy": True}}
 
-It will attempt add all styles that are already tied to apps and models that follow the correct naming convention.
+It will attempt to add all styles that are already tied to apps and models that follow the correct naming convention.
 Can be used in tandem with the ``styles`` setting.
 
 Alternatively entire apps and specific app models can be excluded or included.
