@@ -37,7 +37,7 @@ class TileInlineForm(forms.ModelForm):
         try:
             if settings.COMPOSER.get("load_existing_styles"):
 
-                # Make use of the build in set to remove exact duplicates then
+                # Make use of the built in set to remove exact duplicates then
                 # parse back into a list of tuples.
                 styles = set(styles + self.get_existing_styles())
                 styles = list(styles)
@@ -65,9 +65,9 @@ class TileInlineForm(forms.ModelForm):
         template_dirs = app_directories.get_app_template_dirs("templates")
         installed_apps = apps.app_configs.keys()
 
+        # Traverse all the directories within the template directories for all
+        # available apps.
         template_dict = {}
-        # Traverse all the directories within the template directories of all
-        # availible apps.
         for app_dir in template_dirs:
             for path, dirnames, filenames in os.walk(app_dir):
 
@@ -77,8 +77,7 @@ class TileInlineForm(forms.ModelForm):
                 if filenames and "inclusion_tags" in path:
                     split = path.split("/")
 
-                    # To ensure inclusion_tags is the current directory we are
-                    # in.
+                    # Ensures inclusion_tags is the current directory we are in.
                     if not split[len(split)-1] == "inclusion_tags":
                         continue
 
