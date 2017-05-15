@@ -42,7 +42,7 @@ class TileInlineForm(forms.ModelForm):
         # is missing.
         try:
             setting = settings.COMPOSER
-        except (AttributeError):
+        except AttributeError:
             return current_styles
 
         if not setting.get("load-existing-styles"):
