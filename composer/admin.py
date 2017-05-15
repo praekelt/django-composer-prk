@@ -56,7 +56,7 @@ class TileInlineForm(forms.ModelForm):
 
         # If for some reason none of the actual values are supplied return an
         # empty list.
-        if not greedy and excludes is None and includes is None:
+        if not greedy and (excludes is None) and (includes is None):
             return []
 
         # Get the app template directories and installed apps.
