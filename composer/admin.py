@@ -127,6 +127,10 @@ class TileInlineForm(forms.ModelForm):
                         if to_include != "__all__" and model_name not in to_include:
                             continue
 
+                # Pattern to replace the modelname as well as the file
+                # extension later on.
+                pattern = re.compile((r"%s_|\.html" % (model_name)))
+
                 for template in template_data:
                     filename = template["filename"]
                     path = template["path"]
@@ -138,7 +142,6 @@ class TileInlineForm(forms.ModelForm):
 
                         # Remove the file extension and model name to get only
                         # the style.
-                        pattern = re.compile(("%s_|.html" % (model_name)))
                         style = pattern.sub("", filename)
 
                         # We add the styles to a dictionary, so we can easily
