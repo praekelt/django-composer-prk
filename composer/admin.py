@@ -33,32 +33,30 @@ class TileInlineForm(forms.ModelForm):
         except (AttributeError, KeyError):
             styles = []
         styles.append(("tile", "Tile"))
-
-        try:
-            if settings.COMPOSER.get("load_existing_styles"):
-
-                # Make use of the built in set to remove exact duplicates then
-                # parse back into a list of tuples.
-                styles = set(styles + self.get_existing_styles())
-                styles = list(styles)
-        except (AttributeError):
-            # If the attribute is missing, we don't need to do anything
-            # further.
-            pass
-
+        styles = self.get_existing_styles(styles)
         styles.sort()
         self.fields["style"].widget = forms.widgets.Select(choices=styles)
 
-    def get_existing_styles(self):
+    def get_existing_styles(self, current_styles):
+        # Return the current styles if the composer setting or the specific key
+        # is missing.
+        try:
+            setting = settings.COMPOSER
+        except (AttributeError):
+            return current_styles
+
+        if not setting.get("load-existing-styles"):
+            return current_styles
+
         # Get a list of all the availible templates in the project.
-        styles_settings = settings.COMPOSER["load_existing_styles"]
+        styles_settings = setting["load-existing-styles"]
         greedy = styles_settings.get("greedy", False)
         excludes = styles_settings.get("excludes")
         includes = styles_settings.get("includes")
 
         # If for some reason none of the actual values are supplied return an
         # empty list.
-        if not greedy and excludes == None and includes == None:
+        if not greedy and excludes is None and includes is None:
             return []
 
         # Get the app template directories and installed apps.
@@ -149,7 +147,12 @@ class TileInlineForm(forms.ModelForm):
                             )
 
         # Return the list of tuples containing the found styles.
-        return [(k, v) for k, v in styles_dict.iteritems()]
+        new_styles = [(k, v) for k, v in styles_dict.iteritems()]
+
+        # Make use of the built in set to remove exact duplicates then
+        # parse back into a list of tuples.
+        new_styles = set(current_styles + new_styles)
+        return list(new_styles)
 
 
 class TileInline(nested_admin.NestedTabularInline):

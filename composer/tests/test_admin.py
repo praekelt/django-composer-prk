@@ -5,7 +5,7 @@ from composer import admin
 class TestTileAdminForm(TestCase):
 
     @override_settings(COMPOSER={
-        "load_existing_styles":
+        "load-existing-styles":
         {"greedy": True}
     })
     def test_existing_styles(self):
@@ -20,7 +20,7 @@ class TestTileAdminForm(TestCase):
         self.assertEqual(choices, expected_choices)
 
     @override_settings(COMPOSER={
-        "load_existing_styles":
+        "load-existing-styles":
         {"includes": {"tests": "__all__"}}
     })
     def test_app_styles(self):
@@ -34,7 +34,7 @@ class TestTileAdminForm(TestCase):
         self.assertEqual(choices, expected_choices)
 
     @override_settings(COMPOSER={
-        "load_existing_styles":
+        "load-existing-styles":
         {"excludes": {"tests": ["dummymodel2"]}}
     })
     def test_app_excludes_styles(self):
@@ -47,7 +47,7 @@ class TestTileAdminForm(TestCase):
         self.assertEqual(choices, expected_choices)
 
     @override_settings(COMPOSER={
-        "load_existing_styles":
+        "load-existing-styles":
         {"includes": {"composer": ["tile"]}}
     })
     def test_composer__styles(self):
@@ -59,7 +59,7 @@ class TestTileAdminForm(TestCase):
         self.assertEqual(choices, expected_choices)
 
     @override_settings(COMPOSER={
-        "load_existing_styles":
+        "load-existing-styles":
         {"excludes": {"composer": "__all__"}}
     })
     def test_composer_excludes_styles(self):
@@ -73,7 +73,7 @@ class TestTileAdminForm(TestCase):
         self.assertEqual(choices, expected_choices)
 
     @override_settings(COMPOSER={
-        "load_existing_styles":
+        "load-existing-styles":
         {"greedy": True},
         "styles": [
             ("detail", "Detail"),
