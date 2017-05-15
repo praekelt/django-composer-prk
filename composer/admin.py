@@ -38,8 +38,14 @@ class TileInlineForm(forms.ModelForm):
         self.fields["style"].widget = forms.widgets.Select(choices=styles)
 
     def get_existing_styles(self, current_styles):
-        # Return the current styles if the composer setting or the specific key
-        # is missing.
+        """return list(tuple("key", "val"), ...)
+        self -- current inline form instance.
+        current_styles -- styles that are already present by default or
+        obtained from other settings.
+
+        If the settings are not present, it will return the list of already set
+        styles, by default consisting only of [("tile", "Tile")].
+        """
         try:
             setting = settings.COMPOSER
         except AttributeError:
