@@ -109,6 +109,24 @@ create the corresponding templates: ::
 
     COMPOSER = {"styles": (("block", "Block"), ("tiny": "Tiny"))}
 
+If you would like the styles to be inferred from all the installed apps add: ::
+
+    COMPOSER = {"load-existing-styles": {"greedy": True}}
+
+It will attempt to add all styles that are already tied to apps and models that follow the correct naming convention.
+Can be used in tandem with the ``styles`` setting.
+
+Alternatively entire apps and specific app models can be excluded or included.
+
+Including: ::
+    COMPOSER = {"load-existing-styles": {"includes": {"<app_label>": ["<modelname>",]}}}
+    COMPOSER = {"load-existing-styles": {"includes": {"<app_label>": "__all__"}}}
+
+Excluding: ::
+    COMPOSER = {"load-existing-styles": {"excludes": {"<app_label>": ["<modelname>",]}}}
+    COMPOSER = {"load-existing-styles": {"excludes": {"<app_label>": "__all__"}}}
+
+
 Ad-hoc pages
 ------------
 
