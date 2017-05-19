@@ -119,10 +119,12 @@ Can be used in tandem with the ``styles`` setting.
 Alternatively entire apps and specific app models can be excluded or included.
 
 Including: ::
+
     COMPOSER = {"load-existing-styles": {"includes": {"<app_label>": ["<modelname>",]}}}
     COMPOSER = {"load-existing-styles": {"includes": {"<app_label>": "__all__"}}}
 
 Excluding: ::
+
     COMPOSER = {"load-existing-styles": {"excludes": {"<app_label>": ["<modelname>",]}}}
     COMPOSER = {"load-existing-styles": {"excludes": {"<app_label>": "__all__"}}}
 
