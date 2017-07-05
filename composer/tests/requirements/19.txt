@@ -1,0 +1,14 @@
+psycopg2==2.6.2
+
+appdirs==1.4.0
+BeautifulSoup==3.2.1
+Django==1.9.6
+django-crum==0.7.1
+django-nested-admin==3.0.12
+django-simplemde==0.1.0
+Markdown==2.6.8
+packaging==16.8
+pyparsing==2.1.10
+python-monkey-business==1.0.0
+requests==2.13.0
+six==1.10.0

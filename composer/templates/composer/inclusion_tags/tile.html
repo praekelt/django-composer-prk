@@ -1,0 +1,8 @@
+{% if content %}
+    {{ content|safe }}
+{% endif %}
+{% if object %}
+    object = {{ object }}
+    You should probably override composer/inclusion_tags/tile.html or create a
+    tile template for this content type.
+{% endif %}

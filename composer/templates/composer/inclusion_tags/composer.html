@@ -1,0 +1,16 @@
+{% load composer_tags %}
+
+{% for row in rows %}
+    <div class="composer-row {{ row.class_name }}">
+        {% for column in row.columns %}
+            <div class="composer-column composer-column-{{ column.width }} {{ column.class_name }}">
+                {% if column.title %}<div class="title">{{ column.title }}</div>{% endif %}
+                {% for tile in column.tiles %}
+                    <div class="composer-tile {{ tile.class_name }}" data-oid="{{ tile.id }}">
+                        {% tile tile %}
+                    </div>
+                {% endfor %}
+            </div>
+        {% endfor %}
+    </div>
+{% endfor %}
