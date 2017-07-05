@@ -20,7 +20,7 @@ class ComposerFallbackMiddleware(object):
             return response
 
         try:
-            return SlotView.as_view()(request)
+            return SlotView.as_view()(request).render()
         except Http404:
             # Try the url with a slash appended.
             url = request.path_info
