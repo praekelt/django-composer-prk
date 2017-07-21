@@ -1,7 +1,5 @@
 [run]
 branch = True
-source =
-    composer
 omit =
     *migrations*
     *tests*
