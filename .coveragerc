@@ -1,0 +1,9 @@
+[run]
+branch = True
+omit =
+    *migrations*
+    *tests*
+    *api*
+
+[report]
+show_missing = True

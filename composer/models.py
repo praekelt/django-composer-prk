@@ -199,6 +199,9 @@ class Row(models.Model):
 
         return result
 
+    class Meta:
+        ordering = ['position']
+
 
 class Column(models.Model):
     row = models.ForeignKey(Row)
@@ -226,6 +229,9 @@ class Column(models.Model):
     @property
     def tiles(self):
         return self.tile_set.all().order_by("position")
+
+    class Meta:
+        ordering = ['position']
 
 
 class Tile(models.Model):
@@ -286,3 +292,6 @@ inside the tile if target is set.""",
         if not self.markdown:
             return ""
         return mark_safe(markdown.markdown(self.markdown))
+
+    class Meta:
+        ordering = ['position']
