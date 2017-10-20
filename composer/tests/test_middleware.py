@@ -53,3 +53,9 @@ class MiddleWareTestCase(TestCase):
         with self.settings(APPEND_SLASH=False):
             response = self.client.get("/four-o-four")
             self.assertEqual(response.status_code, 404)
+
+    def test_request_method_options(self):
+        response = self.client.options("/four-o-four/")
+        self.assertEqual(response.status_code, 200)
+        response = self.client.options("/does-not-exist/")
+        self.assertEqual(response.status_code, 404)

@@ -22,3 +22,6 @@ class SlotView(DetailView):
 
     def post(self, request, *args, **kwargs):
         return self.get(request, *args, **kwargs)
+
+    def options(self, request, *args, **kwargs):
+        return self.get(request, *args, **kwargs)

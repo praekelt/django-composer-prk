@@ -1,6 +1,7 @@
 from django.conf import settings
 from django.http import Http404, HttpResponsePermanentRedirect
 from django.shortcuts import get_object_or_404
+from django.template.response import TemplateResponse
 
 from composer.models import Slot
 from composer.views import SlotView
@@ -20,7 +21,11 @@ class ComposerFallbackMiddleware(object):
             return response
 
         try:
-            return SlotView.as_view()(request).render()
+            response = SlotView.as_view()(request)
+            if isinstance(response, TemplateResponse):
+                return response.render()
+            else:
+                return response
         except Http404:
             # Try the url with a slash appended.
             url = request.path_info
