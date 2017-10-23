@@ -11,6 +11,15 @@ class SlotView(DetailView):
 
     model = Slot
 
+    def dispatch(self, request, *args, **kwargs):
+        # Always return the get method's response, except if this view manages
+        # to trigger the method not allowed code path.
+        handler = super(SlotView, self).dispatch(request, *args, **kwargs)
+        if handler.status_code != 405:
+            return self.get(request, *args, **kwargs)
+        else:
+            return handler
+
     def get_object(self):
         # Return the slot based on the path
         url = self.request.path_info
@@ -19,9 +28,3 @@ class SlotView(DetailView):
             url=self.request.path_info,
             slot_name="content"
         )
-
-    def post(self, request, *args, **kwargs):
-        return self.get(request, *args, **kwargs)
-
-    def options(self, request, *args, **kwargs):
-        return self.get(request, *args, **kwargs)
