@@ -54,7 +54,7 @@ class MiddleWareTestCase(TestCase):
             response = self.client.get("/not-a-four-o-four")
             self.assertEqual(response.status_code, 404)
 
-    def test_request_method_options(self):
+    def test_request_method_types(self):
         # options
         response = self.client.options("/not-a-four-o-four/")
         self.assertEqual(response.status_code, 200)

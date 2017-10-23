@@ -15,6 +15,9 @@ class SlotView(DetailView):
         # Always return the get method's response, except if this view manages
         # to trigger the method not allowed code path.
         handler = super(SlotView, self).dispatch(request, *args, **kwargs)
+
+        # The method not allowed path will come back with a 405 "Method Not
+        # Allowed" status. This is checked for and allowed to proceed as usual.
         if handler.status_code != 405:
             return self.get(request, *args, **kwargs)
         else:
