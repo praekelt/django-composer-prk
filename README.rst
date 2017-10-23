@@ -1,5 +1,5 @@
 Django Composer
-=============
+===============
 **Build Pages by composing listings and individual content**
 
 .. image:: https://travis-ci.org/praekelt/django-composer-prk.svg?branch=develop
@@ -33,9 +33,11 @@ Installation
 
 #. Add ``composer.context_processors.slots`` to the context processors setting.
 
-#. Add the following to your urls.py::
+#. Add the following to your urls.py
 
-   url(r"^nested_admin/", include("nested_admin.urls"))
+::
+
+    url(r"^nested_admin/", include("nested_admin.urls"))
 
 Content types
 -------------
