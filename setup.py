@@ -15,7 +15,7 @@ setup(
         "django-crum",
         "django-nested-admin",
         "django-simplemde",
-        "BeautifulSoup", # todo: use bs4
+        "beautifulsoup4",
         "markdown",
     ],
     include_package_data=True,

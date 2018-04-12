@@ -1,4 +1,4 @@
-from BeautifulSoup import BeautifulSoup
+from bs4 import BeautifulSoup
 
 from django import template
 from django.conf import settings
@@ -122,7 +122,7 @@ class TileNode(template.Node):
         soup = BeautifulSoup(html)
         content = soup.find("div", id="content")
         if content:
-            return content.renderContents()
+            return content.encode_contents()
 
         # No content div found
         return html
