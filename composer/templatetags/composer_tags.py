@@ -3,12 +3,15 @@ from bs4 import BeautifulSoup
 from django import template
 from django.conf import settings
 from django.contrib.contenttypes.models import ContentType
-from django.core.urlresolvers import NoReverseMatch, resolve, reverse
 from django.db import models
 from django.http import HttpResponse
 from django.template.loader import render_to_string
 from django.template.response import TemplateResponse
 from django.utils.text import mark_safe
+try:
+    from django.urls import NoReverseMatch, resolve, reverse
+except ImportError:
+    from django.core.urlresolvers import NoReverseMatch, resolve, reverse
 
 from composer.models import Row
 

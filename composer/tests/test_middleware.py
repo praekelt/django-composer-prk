@@ -1,6 +1,9 @@
 from django.contrib.sites.models import Site
-from django.core.urlresolvers import reverse
 from django.test import TestCase
+try:
+    from django.urls import reverse
+except ImportError:
+    from django.core.urlresolvers import reverse
 
 from composer.models import Slot, Row, Column, Tile
 
@@ -11,8 +14,8 @@ class MiddleWareTestCase(TestCase):
     def setUpTestData(cls):
         super(MiddleWareTestCase, cls).setUpTestData()
         cls.slot = Slot.objects.create(slot_name="content", url="/not-a-four-o-four/")
-        cls.slot.sites = Site.objects.all()
         cls.slot.save()
+        cls.slot.sites.set(Site.objects.all())
         cls.tile = Tile.objects.create(
             column=Column.objects.create(row=Row.objects.create(slot=cls.slot))
         )
@@ -37,7 +40,7 @@ class MiddleWareTestCase(TestCase):
         </div>
         <div id="footer">
             Footer slot
-        </div>""" % self.tile.id, response.content)
+        </div>""" % self.tile.id, response.content.decode("utf-8"))
 
     def test_404_no_slash(self):
         response = self.client.get("/not-a-four-o-four")

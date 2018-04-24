@@ -10,7 +10,7 @@ def slots(request):
 
     # Sort by slot url length reversed because we want the best regex match
     slots = list(Slot.permitted.all())
-    slots.sort(lambda a, b: cmp(len(b.url), len(a.url)))
+    slots = sorted(slots, key=lambda item: len(item.url), reverse=True)
 
     # Assemble map with best matches
     slot_map = {}

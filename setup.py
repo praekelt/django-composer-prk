@@ -14,7 +14,7 @@ setup(
     install_requires = [
         "django-crum",
         "django-nested-admin",
-        "django-simplemde",
+        "django-simplemde>=0.1.2",
         "beautifulsoup4",
         "markdown",
     ],

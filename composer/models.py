@@ -3,12 +3,15 @@ import markdown
 from django.conf import settings
 from django.contrib.contenttypes.fields import GenericForeignKey
 from django.contrib.contenttypes.models import ContentType
-from django.core.urlresolvers import get_script_prefix
 from django.core.validators import MaxValueValidator, MinValueValidator
 from django.db import models
 from django.utils.functional import cached_property
 from django.utils.text import mark_safe
 from django.utils.translation import ugettext_lazy as _
+try:
+    from django.urls import get_script_prefix
+except ImportError:
+    from django.core.urlresolvers import get_script_prefix
 
 from simplemde.fields import SimpleMDEField
 
@@ -153,10 +156,10 @@ limited to one or two sentences."),
         # Sort rows and columns in the structure
         result = []
         keys_row = struct.keys()
-        keys_row.sort(lambda a, b: cmp(a.position, b.position))
+        keys_row = sorted(keys_row, key=lambda item: item.position)
         for row in keys_row:
             keys_column = struct[row].keys()
-            keys_column.sort(lambda a, b: cmp(a.position, b.position))
+            keys_column = sorted(keys_column, key=lambda item: item.position)
             column_objs = []
             for column in keys_column:
                 column_objs.append(AttributeWrapper(
@@ -167,7 +170,7 @@ limited to one or two sentences."),
 
 
 class Row(models.Model):
-    slot = models.ForeignKey(Slot)
+    slot = models.ForeignKey(Slot, on_delete=models.CASCADE)
     position = models.PositiveIntegerField(default=0)
     class_name = models.CharField(
         max_length=200,
@@ -193,7 +196,7 @@ class Row(models.Model):
         # Sort columns in the structure
         result = []
         keys_column = struct.keys()
-        keys_column.sort(lambda a, b: cmp(a.position, b.position))
+        keys_column = sorted(keys_column, key=lambda item: item.position)
         for column in keys_column:
             result.append(AttributeWrapper(column, tiles=struct[column]))
 
@@ -204,7 +207,7 @@ class Row(models.Model):
 
 
 class Column(models.Model):
-    row = models.ForeignKey(Row)
+    row = models.ForeignKey(Row, on_delete=models.CASCADE)
     position = models.PositiveIntegerField(default=0)
     width = models.PositiveIntegerField(
         default=8,
@@ -238,7 +241,7 @@ class Tile(models.Model):
     """A block tile that renders a view or an object.
     """
 
-    column = models.ForeignKey(Column)
+    column = models.ForeignKey(Column, on_delete=models.CASCADE)
     position = models.PositiveIntegerField(default=0)
     view_name = models.CharField(
         max_length=200,
@@ -253,6 +256,7 @@ it works. If this value is set it has precedence over target.""",
         related_name="tile_target_content_type",
         null=True,
         blank=True,
+        on_delete=models.CASCADE
     )
     target_object_id = models.PositiveIntegerField(
         null=True,

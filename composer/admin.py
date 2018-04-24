@@ -156,7 +156,7 @@ class TileInlineForm(forms.ModelForm):
                             )
 
         # Return the list of tuples containing the found styles.
-        new_styles = [(k, v) for k, v in styles_dict.iteritems()]
+        new_styles = [(k, v) for k, v in styles_dict.items()]
 
         # Make use of the built in set to remove exact duplicates then
         # parse back into a list of tuples.

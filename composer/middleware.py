@@ -2,6 +2,11 @@ from django.conf import settings
 from django.http import Http404, HttpResponsePermanentRedirect
 from django.shortcuts import get_object_or_404
 from django.template.response import TemplateResponse
+try:
+    from django.utils.deprecation import MiddlewareMixin
+    Mixin = MiddlewareMixin
+except ImportError:
+    Mixin = object
 
 from composer.models import Slot
 from composer.views import SlotView
@@ -11,7 +16,7 @@ if "flatpages" in settings.INSTALLED_APPS:
     from django.contrib.flatpages.views import flatpage
 
 
-class ComposerFallbackMiddleware(object):
+class ComposerFallbackMiddleware(Mixin):
     """Combine composer slot and flatpage fallbacks.
     """
 

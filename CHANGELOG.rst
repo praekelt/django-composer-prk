@@ -4,6 +4,7 @@ Changelog
 next
 ----
 #. Add missing migrations.
+#. Django 2 and Python 3.5 compatibility.
 
 0.1.1
 -----

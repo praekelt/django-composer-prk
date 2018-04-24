@@ -1,3 +1,6 @@
+from importlib import import_module
+
+
 _composer_utils_cache = {}
 
 
@@ -8,16 +11,16 @@ def _build_view_names_recurse(url_patterns=None, namespace=None):
     if url_patterns is None:
         # Must import late
         from django.conf import settings
-        urlconf = settings.ROOT_URLCONF
-        url_patterns = __import__(settings.ROOT_URLCONF, globals(), locals(), \
-                ["urlpatterns", ], -1).urlpatterns
+        mod = import_module(settings.ROOT_URLCONF)
+        url_patterns = mod.urlpatterns
 
     result = []
     for pattern in url_patterns:
         try:
             # Rules: (1) named patterns (2) may not contain arguments.
             if pattern.name is not None:
-                if pattern.regex.pattern.find("<") == -1:
+                actual_pattern = getattr(pattern, "pattern", pattern)
+                if actual_pattern.regex.pattern.find("<") == -1:
                     key = ""
                     if namespace:
                         key = namespace + ":"
@@ -26,7 +29,8 @@ def _build_view_names_recurse(url_patterns=None, namespace=None):
         except AttributeError:
             # If the pattern itself is an include, recursively fetch its
             # patterns. Ignore admin patterns.
-            if not pattern.regex.pattern.startswith("^admin"):
+            actual_pattern = getattr(pattern, "pattern", pattern)
+            if not actual_pattern.regex.pattern.startswith("^admin"):
                 try:
                     result += _build_view_names_recurse(pattern.url_patterns, pattern.namespace)
                 except AttributeError:
@@ -37,7 +41,7 @@ def _build_view_names_recurse(url_patterns=None, namespace=None):
 def get_view_choices():
     # Implement a simple module level cache. The result never changes
     # for the duration of the Django process life.
-    if not _composer_utils_cache.has_key("get_view_choices"):
+    if "get_view_choices" not in _composer_utils_cache:
         result = _build_view_names_recurse()
         result.sort()
         _composer_utils_cache["get_view_choices"] = result

@@ -25,7 +25,7 @@ Quick start
 Installation
 ------------
 
-#. Install the contents of ``composer/tests/requirements/19.txt`` to your Python environment.
+#. Install the contents of ``composer/tests/requirements/{version}.txt`` to your Python environment.
 
 #. Add ``composer`` to the ``INSTALLED_APPS`` setting.
 

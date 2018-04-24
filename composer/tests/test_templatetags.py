@@ -1,6 +1,9 @@
 from django.contrib.sites.models import Site
-from django.core.urlresolvers import reverse
 from django.test import TestCase
+try:
+    from django.urls import reverse
+except ImportError:
+    from django.core.urlresolvers import reverse
 
 from composer.models import Slot, Row, Column, Tile
 from composer.tests.models import DummyModel1, DummyModel2
@@ -15,8 +18,8 @@ class TemplateTagsATestCase(TestCase):
     def setUpTestData(cls):
         super(TemplateTagsATestCase, cls).setUpTestData()
         cls.slot = Slot.objects.create(slot_name="content", url=HOME_REGEX)
-        cls.slot.sites = Site.objects.all()
         cls.slot.save()
+        cls.slot.sites.set(Site.objects.all())
 
     def test_default_slot(self):
         # Home renders the custom composer/inclusion_tags/content.html
@@ -30,7 +33,7 @@ class TemplateTagsATestCase(TestCase):
         </div>
         <div id="footer">
             Footer slot
-        </div>""", response.content)
+        </div>""", response.content.decode("utf-8"))
 
 
 class TemplateTagsBTestCase(TestCase):
@@ -40,8 +43,8 @@ class TemplateTagsBTestCase(TestCase):
         super(TemplateTagsBTestCase, cls).setUpTestData()
         cls.dm_one = DummyModel1.objects.create(title="One")
         cls.slot = Slot.objects.create(slot_name="content", url=HOME_REGEX)
-        cls.slot.sites = Site.objects.all()
         cls.slot.save()
+        cls.slot.sites.set(Site.objects.all())
         cls.tile = Tile.objects.create(
             column=Column.objects.create(row=Row.objects.create(slot=cls.slot))
         )
@@ -67,7 +70,7 @@ class TemplateTagsBTestCase(TestCase):
         </div>
         <div id="footer">
             Footer slot
-        </div>""" % self.tile.id, response.content)
+        </div>""" % self.tile.id, response.content.decode("utf-8"))
 
 
 class TemplateTagsCTestCase(TestCase):
@@ -77,8 +80,8 @@ class TemplateTagsCTestCase(TestCase):
         super(TemplateTagsCTestCase, cls).setUpTestData()
         cls.dm_one = DummyModel2.objects.create(title="One")
         cls.slot = Slot.objects.create(slot_name="content", url=HOME_REGEX)
-        cls.slot.sites = Site.objects.all()
         cls.slot.save()
+        cls.slot.sites.set(Site.objects.all())
         cls.tile = Tile.objects.create(
             column=Column.objects.create(row=Row.objects.create(slot=cls.slot))
         )
@@ -105,7 +108,7 @@ class TemplateTagsCTestCase(TestCase):
         </div>
         <div id="footer">
             Footer slot
-        </div>""" % self.tile.id, response.content)
+        </div>""" % self.tile.id, response.content.decode("utf-8"))
 
 
 class TemplateTagsDTestCase(TestCase):
@@ -114,8 +117,8 @@ class TemplateTagsDTestCase(TestCase):
     def setUpTestData(cls):
         super(TemplateTagsDTestCase, cls).setUpTestData()
         cls.slot = Slot.objects.create(slot_name="header", url="^" + reverse("aaa"))
-        cls.slot.sites = Site.objects.all()
         cls.slot.save()
+        cls.slot.sites.set(Site.objects.all())
         cls.tile = Tile.objects.create(
             column=Column.objects.create(row=Row.objects.create(slot=cls.slot))
         )
@@ -141,7 +144,7 @@ class TemplateTagsDTestCase(TestCase):
         </div>
         <div id="footer">
             Footer slot
-        </div>""" % self.tile.id, response.content)
+        </div>""" % self.tile.id, response.content.decode("utf-8"))
 
 		# bbb also gets the header slot because the regex does not end with a dollar
         response = self.client.get(reverse("bbb"))
@@ -160,7 +163,7 @@ class TemplateTagsDTestCase(TestCase):
         </div>
         <div id="footer">
             Footer slot
-        </div>""" % self.tile.id, response.content)
+        </div>""" % self.tile.id, response.content.decode("utf-8"))
 
 
 class TemplateTagsETestCase(TestCase):
@@ -169,8 +172,8 @@ class TemplateTagsETestCase(TestCase):
     def setUpTestData(cls):
         super(TemplateTagsETestCase, cls).setUpTestData()
         cls.slot = Slot.objects.create(slot_name="header", url=HOME_REGEX)
-        cls.slot.sites = Site.objects.all()
         cls.slot.save()
+        cls.slot.sites.set(Site.objects.all())
         cls.tile = Tile.objects.create(
             column=Column.objects.create(row=Row.objects.create(slot=cls.slot)),
             markdown="***I am bold markdown***"
@@ -196,7 +199,7 @@ class TemplateTagsETestCase(TestCase):
         </div>
         <div id="footer">
             Footer slot
-        </div>""" % self.tile.id, response.content)
+        </div>""" % self.tile.id, response.content.decode("utf-8"))
 
 
 class TemplateTagsContextTestCase(TestCase):
@@ -209,8 +212,8 @@ class TemplateTagsContextTestCase(TestCase):
             url="^" + reverse("slot_context"),
             title="test_title_for_base_slot"
         )
-        cls.slot.sites = Site.objects.all()
         cls.slot.save()
+        cls.slot.sites.set(Site.objects.all())
 
     def test_default_slot(self):
         # slot_context renders the custom
@@ -227,4 +230,4 @@ class TemplateTagsContextTestCase(TestCase):
         </div>
         <div id="footer">
             Footer slot
-        </div>""", response.content)
+        </div>""", response.content.decode("utf-8"))
